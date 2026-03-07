@@ -1,13 +1,20 @@
-# <!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pet Hatcher</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400&display=swap" rel="stylesheet">
-<style>
+<title>Index.html Source Code</title>
+</head>
+<body>
+<pre>
+# &lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+&lt;meta charset="UTF-8"&gt;
+&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+&lt;title&gt;Pet Hatcher&lt;/title&gt;
+&lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;
+&lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin&gt;
+&lt;link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;family=VT323:wght@400&amp;display=swap" rel="stylesheet"&gt;
+&lt;style&gt;
 :root{--bg:#0d0d1a;--panel:#13132a;--panel2:#1a1a35;--border:#2a2a5a;--gold:#ffd700;--goldDim:#a08800;--text:#e8e8ff;--textDim:#7878aa;--rare:#4488ff;--epic:#aa44ff;--legendary:#ff8800;--mythic:#ff44aa;
 --px:'Press Start 2P',monospace;--vt:'VT323','Courier New',monospace;}
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -183,56 +190,56 @@ h1{font-family:'Press Start 2P','Courier New',monospace;font-size:13px;text-alig
 .battlepass-info{font-size:12px;color:var(--text);margin-bottom:6px;}
 .battlepass-button{padding:6px 12px;font-family:'Press Start 2P','Courier New',monospace;font-size:7px;cursor:pointer;border:2px solid var(--gold);background:transparent;color:var(--gold);border-radius:2px;transition:all .15s;}
 .battlepass-button:hover{background:var(--gold);color:var(--bg);}
-</style>
-</head>
-<body>
-<h1>pethatcher</h1>
-<div class="topbar">
-  <div class="coins">💰 <span id="coinDisplay">0</span> COINS</div>
-  <div class="cps-disp" id="cpsDisplay">0 CPS</div>
-  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-    <span style="font-size:14px;color:var(--textDim)">Click pets • Toggle AUTO</span>
-    <span id="saveIndicator" style="font-family:'Press Start 2P',monospace;font-size:7px;color:#44ff88;opacity:0;transition:opacity .4s;">💾 SAVED</span>
-    <button onclick="confirmReset()" style="font-family:'Press Start 2P',monospace;font-size:6px;padding:4px 8px;cursor:pointer;border:1px solid #333;background:transparent;color:#444;border-radius:2px;transition:all .15s;" onmouseover="this.style.borderColor='#ff4444';this.style.color='#ff4444'" onmouseout="this.style.borderColor='#333';this.style.color='#444'">RESET</button>
-  </div>
-</div>
-<div class="main">
-  <div class="shop"><h2>🥚 EGG SHOP</h2><div id="eggShop"></div></div>
-  <div class="collection">
-    <div class="tab-row">
-      <button class="tab-btn active" id="tabBtnCollection" onclick="switchTab('collection')">🐾 MY PETS</button>
-      <button class="tab-btn" id="tabBtnIndex" onclick="switchTab('index')">📖 PET INDEX</button>
-      <button class="tab-btn" id="tabBtnQuests" onclick="switchTab('quests')">⚔️ QUESTS</button>
-      <button class="tab-btn" id="tabBtnLeaderboard" onclick="switchTab('leaderboard')">🏆 LEADERBOARD</button>
-      <button class="tab-btn" id="tabBtnBattlepass" onclick="switchTab('battlepass')">📜 BATTLEPASS</button>
-    </div>
-    <div class="tab-panel active" id="tabCollection"><div class="pet-grid" id="petGrid"></div></div>
-    <div class="tab-panel" id="tabIndex">
-      <div class="idx-progress">Discovered: <span id="idxCount">0</span> / <span id="idxTotal">0</span></div>
-      <div id="idxContent"></div>
-    </div>
-    <div class="tab-panel" id="tabQuests"><div class="quest-panel" id="questContent"></div></div>
-    <div class="tab-panel" id="tabLeaderboard"><div class="leaderboard" id="leaderboardContent"></div></div>
-    <div class="tab-panel" id="tabBattlepass"><div class="battlepass" id="battlepassContent"></div></div>
-  </div>
-</div>
-<div id="hatchOverlay" class="hatch-overlay" style="display:none"></div>
-<div id="usernameOverlay" class="username-overlay" style="display:none">
-  <div class="username-box">
-    <div class="username-title">CREATE USERNAME</div>
-    <input type="text" id="usernameInput" class="username-input" placeholder="Enter username..." maxlength="16">
-    <div id="usernameError" class="username-error"></div>
-    <button id="usernameSubmit" class="username-submit" disabled>CREATE</button>
-  </div>
-</div>
-<div class="mut-event-bar">
-  <div class="mut-event-pill waiting" id="mutPill">⬡ MUTATION EVENT — next in <span id="mutTimer">--:--</span></div>
-</div>
-<script>
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;pethatcher&lt;/h1&gt;
+&lt;div class="topbar"&gt;
+  &lt;div class="coins"&gt;💰 &lt;span id="coinDisplay"&gt;0&lt;/span&gt; COINS&lt;/div&gt;
+  &lt;div class="cps-disp" id="cpsDisplay"&gt;0 CPS&lt;/div&gt;
+  &lt;div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;"&gt;
+    &lt;span style="font-size:14px;color:var(--textDim)"&gt;Click pets • Toggle AUTO&lt;/span&gt;
+    &lt;span id="saveIndicator" style="font-family:'Press Start 2P',monospace;font-size:7px;color:#44ff88;opacity:0;transition:opacity .4s;"&gt;💾 SAVED&lt;/span&gt;
+    &lt;button onclick="confirmReset()" style="font-family:'Press Start 2P',monospace;font-size:6px;padding:4px 8px;cursor:pointer;border:1px solid #333;background:transparent;color:#444;border-radius:2px;transition:all .15s;" onmouseover="this.style.borderColor='#ff4444';this.style.color='#ff4444'" onmouseout="this.style.borderColor='#333';this.style.color='#444'"&gt;RESET&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="main"&gt;
+  &lt;div class="shop"&gt;&lt;h2&gt;🥚 EGG SHOP&lt;/h2&gt;&lt;div id="eggShop"&gt;&lt;/div&gt;&lt;/div&gt;
+  &lt;div class="collection"&gt;
+    &lt;div class="tab-row"&gt;
+      &lt;button class="tab-btn active" id="tabBtnCollection" onclick="switchTab('collection')"&gt;🐾 MY PETS&lt;/button&gt;
+      &lt;button class="tab-btn" id="tabBtnIndex" onclick="switchTab('index')"&gt;📖 PET INDEX&lt;/button&gt;
+      &lt;button class="tab-btn" id="tabBtnQuests" onclick="switchTab('quests')"&gt;⚔️ QUESTS&lt;/button&gt;
+      &lt;button class="tab-btn" id="tabBtnLeaderboard" onclick="switchTab('leaderboard')"&gt;🏆 LEADERBOARD&lt;/button&gt;
+      &lt;button class="tab-btn" id="tabBtnBattlepass" onclick="switchTab('battlepass')"&gt;📜 BATTLEPASS&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div class="tab-panel active" id="tabCollection"&gt;&lt;div class="pet-grid" id="petGrid"&gt;&lt;/div&gt;&lt;/div&gt;
+    &lt;div class="tab-panel" id="tabIndex"&gt;
+      &lt;div class="idx-progress"&gt;Discovered: &lt;span id="idxCount"&gt;0&lt;/span&gt; / &lt;span id="idxTotal"&gt;0&lt;/span&gt;&lt;/div&gt;
+      &lt;div id="idxContent"&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="tab-panel" id="tabQuests"&gt;&lt;div class="quest-panel" id="questContent"&gt;&lt;/div&gt;&lt;/div&gt;
+    &lt;div class="tab-panel" id="tabLeaderboard"&gt;&lt;div class="leaderboard" id="leaderboardContent"&gt;&lt;/div&gt;&lt;/div&gt;
+    &lt;div class="tab-panel" id="tabBattlepass"&gt;&lt;div class="battlepass" id="battlepassContent"&gt;&lt;/div&gt;&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;div id="hatchOverlay" class="hatch-overlay" style="display:none"&gt;&lt;/div&gt;
+&lt;div id="usernameOverlay" class="username-overlay" style="display:none"&gt;
+  &lt;div class="username-box"&gt;
+    &lt;div class="username-title"&gt;CREATE USERNAME&lt;/div&gt;
+    &lt;input type="text" id="usernameInput" class="username-input" placeholder="Enter username..." maxlength="16"&gt;
+    &lt;div id="usernameError" class="username-error"&gt;&lt;/div&gt;
+    &lt;button id="usernameSubmit" class="username-submit" disabled&gt;CREATE&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="mut-event-bar"&gt;
+  &lt;div class="mut-event-pill waiting" id="mutPill"&gt;⬡ MUTATION EVENT — next in &lt;span id="mutTimer"&gt;--:--&lt;/span&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
 const N=null;
 function px(ctx,pixels,w,sc,ox,oy){
   ox=ox||0;oy=oy||0;
-  for(let i=0;i<pixels.length;i++){
+  for(let i=0;i&lt;pixels.length;i++){
     const c=pixels[i];if(!c)continue;
     ctx.fillStyle=c;
     ctx.fillRect((i%w)*sc+ox,Math.floor(i/w)*sc+oy,sc,sc);
@@ -307,7 +314,7 @@ let mutEventEnd=0; // when the active event ends
 function rollMutation(){
   if(!mutEventActive)return'none';
   let r=Math.random()*100;
-  for(const k of['infinite','celestial','void','crystal','none']){r-=MUT_ODDS[k];if(r<=0)return k;}
+  for(const k of['infinite','celestial','void','crystal','none']){r-=MUT_ODDS[k];if(r&lt;=0)return k;}
   return'none';
 }
 
@@ -329,43 +336,43 @@ function updateMutTimer(){
 
   if(mutEventActive){
     const remaining=Math.max(0,mutEventEnd-now);
-    if(remaining<=0){
+    if(remaining&lt;=0){
       mutEventActive=false;
       pill.className='mut-event-pill waiting';
     } else {
       const s=Math.ceil(remaining/1000);
       pill.className='mut-event-pill active';
-      pill.innerHTML=`✦ MUTATION EVENT ACTIVE! ✦ <span id="mutTimer">${s}s left</span>`;
+      pill.innerHTML=`✦ MUTATION EVENT ACTIVE! ✦ &lt;span id="mutTimer"&gt;${s}s left&lt;/span&gt;`;
       return;
     }
   }
 
   const until=mutEventStart-now;
-  if(until<=0){
+  if(until&lt;=0){
     // Start event — advance start time immediately so we don't re-trigger
     mutEventActive=true;
     mutEventEnd=now+EVENT_DURATION;
     mutEventStart=now+EVENT_INTERVAL; // next event 30min from now
     pill.className='mut-event-pill active';
-    pill.innerHTML=`✦ MUTATION EVENT ACTIVE! ✦ <span id="mutTimer">60s left</span>`;
+    pill.innerHTML=`✦ MUTATION EVENT ACTIVE! ✦ &lt;span id="mutTimer"&gt;60s left&lt;/span&gt;`;
     addBattleXp(20); // participation bonus
     // Flash screen
     const flash=document.createElement('div');
     flash.style.cssText='position:fixed;inset:0;background:#ff44ff22;z-index:700;pointer-events:none;';
-    document.body.appendChild(flash);setTimeout(()=>flash.remove(),700);
+    document.body.appendChild(flash);setTimeout(()=&gt;flash.remove(),700);
     return;
   }
 
-  const warnZone=until<=WARN_BEFORE;
+  const warnZone=until&lt;=WARN_BEFORE;
   const mins=Math.floor(until/60000);
   const secs=Math.floor((until%60000)/1000);
-  const timeStr=mins>0?`${mins}:${String(secs).padStart(2,'0')}`:`${secs}s`;
+  const timeStr=mins&gt;0?`${mins}:${String(secs).padStart(2,'0')}`:`${secs}s`;
   if(warnZone){
     pill.className='mut-event-pill warning';
-    pill.innerHTML=`⚡ MUTATION EVENT SOON — <span id="mutTimer">${timeStr}</span>`;
+    pill.innerHTML=`⚡ MUTATION EVENT SOON — &lt;span id="mutTimer"&gt;${timeStr}&lt;/span&gt;`;
   } else {
     pill.className='mut-event-pill waiting';
-    pill.innerHTML=`⬡ MUTATION EVENT — next in <span id="mutTimer">${timeStr}</span>`;
+    pill.innerHTML=`⬡ MUTATION EVENT — next in &lt;span id="mutTimer"&gt;${timeStr}&lt;/span&gt;`;
   }
 }
 
@@ -393,12 +400,12 @@ let questUnlocked=false; // true once Shadow King awarded
 
 function countMutatedPets(){
   let n=0;
-  for(const k in col){if(col[k].mutation&&col[k].mutation!=='none')n+=col[k].count;}
+  for(const k in col){if(col[k].mutation&amp;&amp;col[k].mutation!=='none')n+=col[k].count;}
   return n;
 }
-function questEggsDone(){return totalHatches>=QUEST_EGGS_NEEDED;}
-function questMutsDone(){return countMutatedPets()>=QUEST_MUTS_NEEDED;}
-function allQuestsDone(){return questEggsDone()&&questMutsDone();}
+function questEggsDone(){return totalHatches&gt;=QUEST_EGGS_NEEDED;}
+function questMutsDone(){return countMutatedPets()&gt;=QUEST_MUTS_NEEDED;}
+function allQuestsDone(){return questEggsDone()&amp;&amp;questMutsDone();}
 
 function checkQuestline(){
   if(questUnlocked)return;
@@ -433,7 +440,7 @@ function showShadowKingUnlock(){
   px(ctx,A.shadowking,16,8);
   // Animate bob + shadow pulse
   let bob=0;
-  const skAnim=()=>{
+  const skAnim=()=&gt;{
     if(!document.contains(pc))return;
     bob+=0.05;ctx.clearRect(0,0,128,128);
     ctx.save();ctx.translate(0,Math.round(Math.sin(bob)*3));
@@ -451,18 +458,18 @@ function showShadowKingUnlock(){
   const btn=document.createElement('button');btn.className='hclose';
   btn.style.cssText='border-color:#6600cc;color:#cc88ff;';
   btn.textContent='▶ CLAIM REWARD';
-  btn.onclick=()=>{ov.style.display='none';};
+  btn.onclick=()=&gt;{ov.style.display='none';};
   box.appendChild(hd);box.appendChild(rd);box.appendChild(pc);box.appendChild(desc);box.appendChild(cps);box.appendChild(btn);
   ov.appendChild(box);
-  ov.onclick=e=>{if(e.target===ov)ov.style.display='none';};
+  ov.onclick=e=&gt;{if(e.target===ov)ov.style.display='none';};
   // Dark particle burst
-  for(let i=0;i<35;i++){
+  for(let i=0;i&lt;35;i++){
     const el=document.createElement('div');
     const colors=['#6600cc','#9900ff','#cc44ff','#440088','#aa00ff'];
     const c=colors[Math.floor(Math.random()*colors.length)];
     const sz=(4+Math.random()*8)+'px';
     el.style.cssText=`position:fixed;width:${sz};height:${sz};background:${c};left:${20+Math.random()*60}%;top:${20+Math.random()*60}%;z-index:700;pointer-events:none;border-radius:1px;animation:floatUp ${.5+Math.random()*1.4}s ease-out forwards;box-shadow:0 0 8px ${c};`;
-    document.body.appendChild(el);setTimeout(()=>el.remove(),2000);
+    document.body.appendChild(el);setTimeout(()=&gt;el.remove(),2000);
   }
 }
 
@@ -472,12 +479,12 @@ function spawnFloat(x,y,txt,c){
   if(c)el.style.color=c;
   el.style.left=(x-20)+'px';el.style.top=(y-16)+'px';
   document.body.appendChild(el);
-  setTimeout(()=>el.remove(),900);
+  setTimeout(()=&gt;el.remove(),900);
   addBattleXp(1);
 }
 function rollRarity(o){
   let r=Math.random()*100;
-  for(const k of['mythic','legendary','epic','rare','common']){r-=o[k];if(r<=0)return k;}
+  for(const k of['mythic','legendary','epic','rare','common']){r-=o[k];if(r&lt;=0)return k;}
   return'common';
 }
 function calcCps(){
@@ -488,26 +495,26 @@ function calcCps(){
 function updateTop(){
   document.getElementById('coinDisplay').textContent=Math.floor(coins).toLocaleString();
   const c=calcCps();
-  document.getElementById('cpsDisplay').textContent=c>0?`⚡${c.toLocaleString()} CPS`:'0 CPS';
-  PACKS.forEach(p=>{const el=document.getElementById('pk_'+p.id);if(el)el.classList.toggle('cant-afford',coins<p.cost);});
+  document.getElementById('cpsDisplay').textContent=c&gt;0?`⚡${c.toLocaleString()} CPS`:'0 CPS';
+  PACKS.forEach(p=&gt;{const el=document.getElementById('pk_'+p.id);if(el)el.classList.toggle('cant-afford',coins&lt;p.cost);});
   updateLeaderboard(c);
   renderBattlepass();
 }
 
 function buildShop(){
   const s=document.getElementById('eggShop');s.innerHTML='';
-  PACKS.forEach(p=>{
+  PACKS.forEach(p=&gt;{
     const card=document.createElement('div');
-    card.className='egg-card'+(coins<p.cost?' cant-afford':'')+(p.isChampion?' champion-card':'');
+    card.className='egg-card'+(coins&lt;p.cost?' cant-afford':'')+(p.isChampion?' champion-card':'');
     card.id='pk_'+p.id;
     const ec=document.createElement('canvas');ec.width=48;ec.height=48;
     const ctx=ec.getContext('2d');ctx.imageSmoothingEnabled=false;
     if(p.isChampion){
       let champEggHue=0;
-      const drawChampEgg=()=>{
+      const drawChampEgg=()=&gt;{
         ctx.clearRect(0,0,48,48);
         const shapes=[[5,0,4],[4,1,6],[3,2,8],[2,3,10],[1,4,12],[1,5,12],[0,6,14],[0,7,14],[0,8,14],[0,9,14],[1,10,12],[1,11,12],[2,12,10],[3,13,8],[4,14,6]];
-        shapes.forEach(([x,y,w],i)=>{
+        shapes.forEach(([x,y,w],i)=&gt;{
           const hue=(champEggHue+i*20)%360;
           ctx.fillStyle=`hsl(${hue},100%,65%)`;
           ctx.fillRect(x*3,y*3,w*3,3);
@@ -515,7 +522,7 @@ function buildShop(){
         champEggHue=(champEggHue+2)%360;
       };
       drawChampEgg();
-      const animEgg=()=>{
+      const animEgg=()=&gt;{
         if(!document.contains(ec))return;
         drawChampEgg();
         requestAnimationFrame(animEgg);
@@ -524,24 +531,24 @@ function buildShop(){
     } else {drawEgg(ctx,p.ec1,p.ec2,3);}
     const info=document.createElement('div');info.className='egg-info';
     if(p.isChampion){
-      info.innerHTML=`<div class="ename champ-label">${p.name}</div><div class="ecost">💰${p.cost.toLocaleString()}</div><div class="eodds"><span style="animation:rainbowText 2s linear infinite;display:inline-block">✦ CHAMPION: 0.01%</span><br><span style="color:#555;font-size:11px">Nothing else: 99.99%</span></div>`;
+      info.innerHTML=`&lt;div class="ename champ-label"&gt;${p.name}&lt;/div&gt;&lt;div class="ecost"&gt;💰${p.cost.toLocaleString()}&lt;/div&gt;&lt;div class="eodds"&gt;&lt;span style="animation:rainbowText 2s linear infinite;display:inline-block"&gt;✦ CHAMPION: 0.01%&lt;/span&gt;&lt;br&gt;&lt;span style="color:#555;font-size:11px"&gt;Nothing else: 99.99%&lt;/span&gt;&lt;/div&gt;`;
     } else {
-      info.innerHTML=`<div class="ename">${p.name}</div><div class="ecost">💰${p.cost.toLocaleString()}</div><div class="eodds"><span style="color:#aaa">C:${p.odds.common}%</span><span style="color:#4488ff"> R:${p.odds.rare}%</span><span style="color:#aa44ff"> E:${p.odds.epic}%</span><span style="color:#ff8800"> L:${p.odds.legendary}%</span><span style="color:#ff44aa"> M:${p.odds.mythic}%</span></div>`;
+      info.innerHTML=`&lt;div class="ename"&gt;${p.name}&lt;/div&gt;&lt;div class="ecost"&gt;💰${p.cost.toLocaleString()}&lt;/div&gt;&lt;div class="eodds"&gt;&lt;span style="color:#aaa"&gt;C:${p.odds.common}%&lt;/span&gt;&lt;span style="color:#4488ff"&gt; R:${p.odds.rare}%&lt;/span&gt;&lt;span style="color:#aa44ff"&gt; E:${p.odds.epic}%&lt;/span&gt;&lt;span style="color:#ff8800"&gt; L:${p.odds.legendary}%&lt;/span&gt;&lt;span style="color:#ff44aa"&gt; M:${p.odds.mythic}%&lt;/span&gt;&lt;/div&gt;`;
     }
     card.appendChild(ec);card.appendChild(info);
-    card.onclick=()=>openPack(p);
+    card.onclick=()=&gt;openPack(p);
     s.appendChild(card);
   });
 }
 
 function openPack(p){
-  if(coins<p.cost)return;
+  if(coins&lt;p.cost)return;
   coins-=p.cost;totalHatches++;
   updateTop();
   addBattleXp(5); // xp for opening packs
   if(p.isChampion){
     const roll=Math.random()*100;
-    if(roll<=0.01){
+    if(roll&lt;=0.01){
       const pet=p.pets.champion;
       const key='champion_champion';
       if(!col[key])col[key]={count:0,pet,rarity:'champion',mutation:'none',autoOn:false,autoInterval:null};
@@ -576,13 +583,13 @@ function showChampionFail(p){
   const ec=document.createElement('canvas');ec.width=128;ec.height=128;
   const ctx=ec.getContext('2d');ctx.imageSmoothingEnabled=false;
   drawChampionEgg(ctx,8);
-  setTimeout(()=>{ctx.clearRect(0,0,128,128);ctx.fillStyle='#333';ctx.font='14px monospace';ctx.textAlign='center';ctx.fillText('💨 empty...',64,72);},400);
+  setTimeout(()=&gt;{ctx.clearRect(0,0,128,128);ctx.fillStyle='#333';ctx.font='14px monospace';ctx.textAlign='center';ctx.fillText('💨 empty...',64,72);},400);
   const sub=document.createElement('div');sub.style.cssText='font-size:14px;color:#555;margin-bottom:12px;';sub.textContent='Better luck next time... (0.01%)';
   const btn=document.createElement('button');btn.className='hclose';btn.style.borderColor='#444';btn.style.color='#555';btn.textContent='▶ TRY AGAIN';
-  btn.onclick=()=>ov.style.display='none';
+  btn.onclick=()=&gt;ov.style.display='none';
   box.appendChild(rd);box.appendChild(ec);box.appendChild(sub);box.appendChild(btn);
   ov.appendChild(box);
-  ov.onclick=e=>{if(e.target===ov)ov.style.display='none';};
+  ov.onclick=e=&gt;{if(e.target===ov)ov.style.display='none';};
 }
 
 function showHatch(p,pet,rar,mut){
@@ -604,7 +611,7 @@ function showHatch(p,pet,rar,mut){
   if(rar==='champion'){nd.style.animation='rainbowText 1s linear infinite';nd.style.fontFamily='Press Start 2P,monospace';}
   nd.textContent=pet.name;
   const btn=document.createElement('button');btn.className='hclose';btn.textContent='▶ COLLECT';
-  btn.onclick=()=>ov.style.display='none';
+  btn.onclick=()=&gt;ov.style.display='none';
   box.appendChild(rd);box.appendChild(pc);box.appendChild(nd);
   // Mutation display
   const mutInfo=MUTATIONS[mut];
@@ -620,18 +627,18 @@ function showHatch(p,pet,rar,mut){
   }
   box.appendChild(btn);
   ov.appendChild(box);
-  ov.onclick=e=>{if(e.target===ov)ov.style.display='none';};
-  setTimeout(()=>{
+  ov.onclick=e=&gt;{if(e.target===ov)ov.style.display='none';};
+  setTimeout(()=&gt;{
     ctx.clearRect(0,0,128,128);
     if(rar==='champion')drawChampionPet(ctx,8);
     else px(ctx,A[pet.ak],16,8);
-    if(rar==='champion'){for(let w=0;w<5;w++)setTimeout(()=>boomRainbow(),w*200);}
+    if(rar==='champion'){for(let w=0;w&lt;5;w++)setTimeout(()=&gt;boomRainbow(),w*200);}
     else if(mut!=='none')boomMutation(mutInfo.color);
     else boom(ri.c);
   },480);
   if(rar==='champion'){
     let hue=0;
-    const champAnim=()=>{
+    const champAnim=()=&gt;{
       if(!document.contains(pc))return;
       ctx.clearRect(0,0,128,128);
       drawChampionPet(ctx,8,hue);
@@ -643,36 +650,36 @@ function showHatch(p,pet,rar,mut){
 }
 
 function boom(c){
-  for(let i=0;i<20;i++){
+  for(let i=0;i&lt;20;i++){
     const el=document.createElement('div');
     el.style.cssText=`position:fixed;width:5px;height:5px;background:${c};left:${35+Math.random()*30}%;top:${35+Math.random()*30}%;z-index:700;pointer-events:none;border-radius:1px;animation:floatUp ${.5+Math.random()*.8}s ease-out forwards;`;
-    document.body.appendChild(el);setTimeout(()=>el.remove(),1300);
+    document.body.appendChild(el);setTimeout(()=&gt;el.remove(),1300);
   }
 }
 
 function boomRainbow(){
   const colors=['#ff4444','#ff8800','#ffff00','#44ff88','#44aaff','#aa44ff','#ff44aa','#ffffff'];
-  for(let i=0;i<40;i++){
+  for(let i=0;i&lt;40;i++){
     const el=document.createElement('div');
     const c=colors[Math.floor(Math.random()*colors.length)];
     const size=(3+Math.random()*6)+'px';
     el.style.cssText=`position:fixed;width:${size};height:${size};background:${c};left:${20+Math.random()*60}%;top:${20+Math.random()*60}%;z-index:700;pointer-events:none;border-radius:1px;animation:floatUp ${.4+Math.random()*1.2}s ease-out forwards;box-shadow:0 0 4px ${c};`;
-    document.body.appendChild(el);setTimeout(()=>el.remove(),1600);
+    document.body.appendChild(el);setTimeout(()=&gt;el.remove(),1600);
   }
 }
 
 function boomMutation(color){
-  for(let i=0;i<30;i++){
+  for(let i=0;i&lt;30;i++){
     const el=document.createElement('div');
     const size=(3+Math.random()*7)+'px';
     el.style.cssText=`position:fixed;width:${size};height:${size};background:${color};left:${25+Math.random()*50}%;top:${25+Math.random()*50}%;z-index:700;pointer-events:none;border-radius:1px;animation:floatUp ${.4+Math.random()*1.2}s ease-out forwards;box-shadow:0 0 6px ${color};`;
-    document.body.appendChild(el);setTimeout(()=>el.remove(),1600);
+    document.body.appendChild(el);setTimeout(()=&gt;el.remove(),1600);
   }
 }
 
 function drawChampionEgg(ctx,sc){
   const shapes=[[5,0,4],[4,1,6],[3,2,8],[2,3,10],[1,4,12],[1,5,12],[0,6,14],[0,7,14],[0,8,14],[0,9,14],[1,10,12],[1,11,12],[2,12,10],[3,13,8],[4,14,6]];
-  shapes.forEach(([x,y,w],i)=>{
+  shapes.forEach(([x,y,w],i)=&gt;{
     const hue=(i/shapes.length*360+Date.now()/20)%360;
     ctx.fillStyle=`hsl(${hue},100%,65%)`;
     ctx.fillRect(x*sc,y*sc,w*sc,sc);
@@ -681,7 +688,7 @@ function drawChampionEgg(ctx,sc){
 
 function drawChampionPet(ctx,sc,hueOff=0){
   const shape=[0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,2,2,2,2,2,1,0,0,0,0,0,0,0,0,1,2,2,3,3,3,2,2,1,0,0,0,0,0,0,1,2,3,1,1,1,1,3,2,2,1,0,0,0,0,1,2,3,1,2,2,2,2,1,3,2,2,1,0,0,0,1,2,3,1,1,1,1,1,1,3,2,2,1,0,0,1,2,3,3,1,2,1,1,2,1,3,3,2,2,1,0,1,2,2,3,1,1,2,2,1,1,3,2,2,2,1,0,1,2,2,3,1,1,1,1,1,1,3,2,2,2,1,0,1,2,3,3,1,2,2,2,2,1,3,3,2,2,1,0,0,1,2,3,3,1,2,2,1,3,3,2,2,1,0,0,0,1,2,2,2,2,1,1,2,2,2,2,2,1,0,0,0,0,1,2,2,1,2,2,1,2,2,1,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-  for(let i=0;i<shape.length;i++){
+  for(let i=0;i&lt;shape.length;i++){
     const v=shape[i];if(!v)continue;
     const x=(i%16)*sc,y=Math.floor(i/16)*sc;
     const hue=(hueOff+i*6)%360;
@@ -697,8 +704,8 @@ function renderCol(){
   const grid=document.getElementById('petGrid');
   grid.innerHTML='';
   const ord=['shadowking','champion','mythic','legendary','epic','rare','common'];
-  const sorted=Object.entries(col).sort(([,a],[,b])=>ord.indexOf(a.rarity)-ord.indexOf(b.rarity));
-  sorted.forEach(([key,c])=>{
+  const sorted=Object.entries(col).sort(([,a],[,b])=&gt;ord.indexOf(a.rarity)-ord.indexOf(b.rarity));
+  sorted.forEach(([key,c])=&gt;{
     const mut=c.mutation||'none';
     const mutInfo=MUTATIONS[mut];
     const slot=document.createElement('div');
@@ -706,7 +713,7 @@ function renderCol(){
     const cv=document.createElement('canvas');cv.width=64;cv.height=64;cv.style.imageRendering='pixelated';
     const earn=calcEffectiveClick(c);
     const rarColor=c.rarity==='champion'?'#ffffff':(RC[c.rarity]?.c||'#fff');
-    cv.addEventListener('click',()=>{
+    cv.addEventListener('click',()=&gt;{
       coins+=earn;totalCoins+=earn;updateTop();
       const r=cv.getBoundingClientRect();
       spawnFloat(r.left+32,r.top-4,'+'+earn.toLocaleString(),mut!=='none'?mutInfo.color:rarColor);
@@ -716,12 +723,12 @@ function renderCol(){
     const cnt=document.createElement('div');cnt.className='pcount';cnt.id='cnt_'+key;cnt.textContent='×'+c.count;
     // Mutation badge
     let mutBadge='';
-    if(mut!=='none') mutBadge=`<div class="mut-badge ${mut}">${mutInfo.emoji} ${mutInfo.label}</div>`;
+    if(mut!=='none') mutBadge=`&lt;div class="mut-badge ${mut}"&gt;${mutInfo.emoji} ${mutInfo.label}&lt;/div&gt;`;
     const cp=document.createElement('div');cp.className='pcps';cp.id='cp_'+key;
     cp.textContent=c.autoOn?`⚡${Math.round(calcEffectiveCps(c)).toLocaleString()}/s`:'+'+earn.toLocaleString()+'/click';
     const ab=document.createElement('button');ab.className='abtn'+(c.autoOn?' on':'');
     ab.textContent=c.autoOn?'AUTO ON':'AUTO OFF';
-    ab.addEventListener('click',()=>toggleAuto(key,ab,cp,c));
+    ab.addEventListener('click',()=&gt;toggleAuto(key,ab,cp,c));
     slot.appendChild(cv);slot.appendChild(nm);
     if(mutBadge){const mb=document.createElement('div');mb.innerHTML=mutBadge;slot.appendChild(mb.firstChild);}
     slot.appendChild(cnt);slot.appendChild(cp);slot.appendChild(ab);
@@ -729,7 +736,7 @@ function renderCol(){
     anims[key]={b:Math.random()*Math.PI*2,hue:0,rid:0};
     const anim=anims[key];
     if(c.rarity==='champion'){
-      const champLoop=()=>{
+      const champLoop=()=&gt;{
         const ctx2=cv.getContext('2d');ctx2.clearRect(0,0,64,64);ctx2.imageSmoothingEnabled=false;
         anim.b+=0.04;
         const yo=Math.round(Math.sin(anim.b)*2);
@@ -738,7 +745,7 @@ function renderCol(){
       };
       champLoop();
     } else if(c.rarity==='shadowking'){
-      const skLoop=()=>{
+      const skLoop=()=&gt;{
         const ctx2=cv.getContext('2d');ctx2.clearRect(0,0,64,64);ctx2.imageSmoothingEnabled=false;
         anim.b+=0.04;const yo=Math.round(Math.sin(anim.b)*2);
         ctx2.save();ctx2.translate(0,yo);px(ctx2,A.shadowking,16,4);ctx2.restore();
@@ -746,7 +753,7 @@ function renderCol(){
       };
       skLoop();
     } else {
-      const loop=()=>{
+      const loop=()=&gt;{
         const ctx2=cv.getContext('2d');ctx2.clearRect(0,0,64,64);ctx2.imageSmoothingEnabled=false;
         anim.b+=0.05;const yo=Math.round(Math.sin(anim.b)*2);
         px(ctx2,A[c.pet.ak],16,4,0,yo);anim.rid=requestAnimationFrame(loop);
@@ -763,7 +770,7 @@ function toggleAuto(key,btn,cp,c){
     cp.textContent='+'+calcEffectiveClick(c)+'/click';
   } else {
     c.autoOn=true;
-    c.autoInterval=setInterval(()=>{
+    c.autoInterval=setInterval(()=&gt;{
       const g=calcEffectiveCps(c);coins+=g;totalCoins+=g;updateTop();
       debouncedSave();
     },1000);
@@ -830,7 +837,7 @@ function renderQuests(){
   t2fill.style.width=mutsPct+'%';
   t2bar.appendChild(t2fill);
   const t2lbl=document.createElement('div');t2lbl.className='quest-bar-label';
-  t2lbl.textContent=muts+' / '+QUEST_MUTS_NEEDED+(mutsPct>0?' (open packs during Mutation Events!)':'');
+  t2lbl.textContent=muts+' / '+QUEST_MUTS_NEEDED+(mutsPct&gt;0?' (open packs during Mutation Events!)':'');
   t2.appendChild(t2l);t2.appendChild(t2bar);t2.appendChild(t2lbl);
   card.appendChild(t2);
 
@@ -843,12 +850,12 @@ function renderQuests(){
     px(rctx,A.shadowking,16,3);
   } else {
     // silhouette
-    const silhouette=A.shadowking.map(p=>p?'#220033':N);
+    const silhouette=A.shadowking.map(p=&gt;p?'#220033':N);
     px(rctx,silhouette,16,3);
   }
   const rname=document.createElement('div');
   rname.style.cssText='font-family:Press Start 2P,monospace;font-size:7px;color:'+(questUnlocked?'#cc88ff':'#440066')+';line-height:1.8;';
-  rname.innerHTML=(questUnlocked?'Shadow King<br><span style="color:#44ff88;font-size:6px">✔ UNLOCKED</span>':'Shadow King<br><span style="font-size:6px;color:#440066">???</span>');
+  rname.innerHTML=(questUnlocked?'Shadow King&lt;br&gt;&lt;span style="color:#44ff88;font-size:6px"&gt;✔ UNLOCKED&lt;/span&gt;':'Shadow King&lt;br&gt;&lt;span style="font-size:6px;color:#440066"&gt;???&lt;/span&gt;');
   reward.appendChild(rl);reward.appendChild(rc);reward.appendChild(rname);
   card.appendChild(reward);
 
@@ -864,7 +871,7 @@ function renderQuests(){
   // Hint blurb
   const hint=document.createElement('div');
   hint.style.cssText='font-size:13px;color:var(--textDim);margin-top:10px;line-height:1.7;padding:0 4px;';
-  hint.innerHTML='<b style="color:#6600cc">Questline pets</b> cannot be obtained from packs.<br>Complete all tasks to unlock the reward permanently.';
+  hint.innerHTML='&lt;b style="color:#6600cc"&gt;Questline pets&lt;/b&gt; cannot be obtained from packs.&lt;br&gt;Complete all tasks to unlock the reward permanently.';
   cont.appendChild(hint);
 }
 
@@ -908,34 +915,34 @@ function getOwnedKeys(){
 function renderIndex(){
   const owned=getOwnedKeys();
   const total=ALL_PETS.length;
-  const found=[...owned].filter(ak=>ALL_PETS.find(p=>p.ak===ak)).length;
+  const found=[...owned].filter(ak=&gt;ALL_PETS.find(p=&gt;p.ak===ak)).length;
   document.getElementById('idxCount').textContent=found;
   document.getElementById('idxTotal').textContent=total;
   const groups={};
-  ALL_PETS.forEach(p=>{if(!groups[p.packName])groups[p.packName]=[];groups[p.packName].push(p);});
+  ALL_PETS.forEach(p=&gt;{if(!groups[p.packName])groups[p.packName]=[];groups[p.packName].push(p);});
   const cont=document.getElementById('idxContent');cont.innerHTML='';
-  Object.entries(groups).forEach(([packName,pets])=>{
+  Object.entries(groups).forEach(([packName,pets])=&gt;{
     const sec=document.createElement('div');sec.className='idx-section';
     const title=document.createElement('div');title.className='idx-section-title';title.textContent='— '+packName.toUpperCase()+' —';
     sec.appendChild(title);
     const grid=document.createElement('div');grid.className='idx-grid';
-    pets.forEach(petDef=>{
+    pets.forEach(petDef=&gt;{
       const isOwned=owned.has(petDef.ak);
-      const count=isOwned?(()=>{for(const k in col)if(col[k].pet.ak===petDef.ak)return col[k].count;return 1;})():0;
+      const count=isOwned?(()=&gt;{for(const k in col)if(col[k].pet.ak===petDef.ak)return col[k].count;return 1;})():0;
       const slot=document.createElement('div');
       slot.className='idx-slot '+(isOwned?'found '+petDef.rarity:'undiscovered');
       const cv=document.createElement('canvas');cv.width=48;cv.height=48;
       const ctx=cv.getContext('2d');ctx.imageSmoothingEnabled=false;
-      if(petDef.rarity==='champion'&&isOwned){
+      if(petDef.rarity==='champion'&amp;&amp;isOwned){
         let h=0;
-        const idxAnim=()=>{
+        const idxAnim=()=&gt;{
           if(!document.contains(cv))return;
           ctx.clearRect(0,0,48,48);drawChampionPet(ctx,3,h);h=(h+2)%360;requestAnimationFrame(idxAnim);
         };
         idxAnim();
-      } else if(petDef.rarity==='shadowking'&&!isOwned){
+      } else if(petDef.rarity==='shadowking'&amp;&amp;!isOwned){
         // silhouette
-        const sil=A.shadowking.map(p=>p?'#220033':N);
+        const sil=A.shadowking.map(p=&gt;p?'#220033':N);
         px(ctx,sil,16,3);
       } else {
         if(petDef.ak==='champion')px(ctx,A.champion,16,3);
@@ -945,7 +952,7 @@ function renderIndex(){
       const rar=document.createElement('div');rar.className='idx-rarity';
       const rarInfo=RC[petDef.rarity]||{c:'#fff',l:'CHAMPION'};
       rar.style.color=rarInfo.c;rar.textContent=isOwned?rarInfo.l:'?????';
-      if(isOwned&&count>0){
+      if(isOwned&amp;&amp;count&gt;0){
         const badge=document.createElement('div');badge.className='idx-count-badge';badge.textContent='×'+count;slot.appendChild(badge);
       }
       slot.appendChild(cv);slot.appendChild(nm);slot.appendChild(rar);grid.appendChild(slot);
@@ -970,14 +977,14 @@ function saveGame(){
   try{
     localStorage.setItem(SAVE_KEY,JSON.stringify(data));
     const ind=document.getElementById('saveIndicator');
-    if(ind){ind.style.opacity='1';setTimeout(()=>ind.style.opacity='0',1500);}
+    if(ind){ind.style.opacity='1';setTimeout(()=&gt;ind.style.opacity='0',1500);}
   }catch(e){console.warn('Save failed',e);}
 }
 
 // Debounced save — coalesces rapid events (e.g. fast clicking) into one save 2s after last event
 function debouncedSave(){
   if(_saveTimer)clearTimeout(_saveTimer);
-  _saveTimer=setTimeout(()=>{_saveTimer=null;saveGame();},2000);
+  _saveTimer=setTimeout(()=&gt;{_saveTimer=null;saveGame();},2000);
 }
 
 function loadGame(){
@@ -1014,7 +1021,7 @@ function restoreAuto(key){
   const c=col[key];
   if(!c)return;
   c.autoOn=true;
-  c.autoInterval=setInterval(()=>{
+  c.autoInterval=setInterval(()=&gt;{
     const g=calcEffectiveCps(c);coins+=g;totalCoins+=g;updateTop();
     debouncedSave();
   },1000);
@@ -1035,7 +1042,7 @@ const forbiddenWords=['nazi','hitler','fuck','shit','ass','bitch','cunt','kike',
 function isBadUsername(u){
   if(!/^[a-z]{3,16}$/.test(u))return true;
   // duplicate check
-  if(leaderboard.some(e=>e.username===u && u!==username)) return true;
+  if(leaderboard.some(e=&gt;e.username===u &amp;&amp; u!==username)) return true;
   const norm=normalizeUsername(u);
   for(const w of forbiddenWords){if(norm.includes(w))return true;}
   return false;
@@ -1048,14 +1055,14 @@ function showUsernameOverlay(){
   const btn=document.getElementById('usernameSubmit');
   ov.style.display='flex';
   inp.value='';err.textContent='';btn.disabled=true;
-  inp.oninput=()=>{
+  inp.oninput=()=&gt;{
     inp.value=inp.value.toLowerCase().replace(/[^a-z]/g,'');
     if(isBadUsername(inp.value)){
       err.textContent='Username not allowed. Please choose another.';
       btn.disabled=true;
-    } else {err.textContent='';btn.disabled=inp.value.length<3;}
+    } else {err.textContent='';btn.disabled=inp.value.length&lt;3;}
   };
-  btn.onclick=()=>{
+  btn.onclick=()=&gt;{
     username=inp.value;
     ov.style.display='none';
     saveGame();
@@ -1073,14 +1080,14 @@ function saveLeaderboard(){
 
 function updateLeaderboard(cps){
   if(!username)return;
-  const existing=leaderboard.find(e=>e.username===username);
+  const existing=leaderboard.find(e=&gt;e.username===username);
   if(existing){
-    if(cps>existing.cps)existing.cps=cps;
+    if(cps&gt;existing.cps)existing.cps=cps;
   } else {
     leaderboard.push({username,cps});
   }
-  leaderboard.sort((a,b)=>b.cps-a.cps);
-  if(leaderboard.length>50)leaderboard.length=50;
+  leaderboard.sort((a,b)=&gt;b.cps-a.cps);
+  if(leaderboard.length&gt;50)leaderboard.length=50;
   renderLeaderboard();
   saveGame();
 }
@@ -1088,12 +1095,12 @@ function updateLeaderboard(cps){
 function renderLeaderboard(){
   const cont=document.getElementById('leaderboardContent');
   if(!cont)return;
-  cont.innerHTML='<h2>LEADERBOARD</h2>';
-  if(leaderboard.length > 0){
+  cont.innerHTML='&lt;h2&gt;LEADERBOARD&lt;/h2&gt;';
+  if(leaderboard.length &gt; 0){
     const toggleBtn = document.createElement('button');
     toggleBtn.className = 'battlepass-button';
     toggleBtn.textContent = showUsernames ? 'Hide Usernames' : 'Show Usernames';
-    toggleBtn.onclick = () => {
+    toggleBtn.onclick = () =&gt; {
       if(!showUsernames){
         if(confirm('There is not much of a filter on usernames so show at your own risk.')){
           showUsernames = true;
@@ -1108,13 +1115,13 @@ function renderLeaderboard(){
     };
     cont.appendChild(toggleBtn);
   }
-  leaderboard.forEach((e,i)=>{
+  leaderboard.forEach((e,i)=&gt;{
     const div=document.createElement('div');
     div.className='leaderboard-entry'+(e.username===username?' current':'');
     const displayName = showUsernames || e.username === username ? e.username : 'Anonymous';
-    div.innerHTML=`<div class="leaderboard-rank">${i+1}.</div>
-                    <div class="leaderboard-name">${displayName}</div>
-                    <div class="leaderboard-cps">${e.cps} CPS</div>`;
+    div.innerHTML=`&lt;div class="leaderboard-rank"&gt;${i+1}.&lt;/div&gt;
+                    &lt;div class="leaderboard-name"&gt;${displayName}&lt;/div&gt;
+                    &lt;div class="leaderboard-cps"&gt;${e.cps} CPS&lt;/div&gt;`;
     cont.appendChild(div);
   });
 }
@@ -1122,17 +1129,17 @@ function renderLeaderboard(){
 // Battlepass calculations
 function xpForLevel(l){return 100*l;} // could adjust
 function hasWickedCommander(){
-  return Object.values(col).some(c=>c.pet.ak==='wickedwarrior'&&c.count>0);
+  return Object.values(col).some(c=&gt;c.pet.ak==='wickedwarrior'&amp;&amp;c.count&gt;0);
 }
 function addBattleXp(amount){
-  if(amount<=0)return;
+  if(amount&lt;=0)return;
   battleXp+=amount;
-  while(battleLevel<50 && battleXp>=xpForLevel(battleLevel)){
+  while(battleLevel&lt;50 &amp;&amp; battleXp&gt;=xpForLevel(battleLevel)){
     battleXp-=xpForLevel(battleLevel);
     battleLevel++;
     if(battleLevel%5===0)awardBattlepassEgg();
   }
-  if(battleLevel>=50){
+  if(battleLevel&gt;=50){
     battleXp=Math.min(battleXp,xpForLevel(50)-1);
   }
   renderBattlepass();
@@ -1150,25 +1157,25 @@ function renderBattlepass(){
   cont.appendChild(lvl);
   const barWrap=document.createElement('div');barWrap.className='battlepass-bar';
   const fill=document.createElement('div');fill.className='battlepass-fill';
-  const pct=battleLevel<50?((battleXp/xpForLevel(battleLevel))*100):100;
+  const pct=battleLevel&lt;50?((battleXp/xpForLevel(battleLevel))*100):100;
   fill.style.width=pct+'%';barWrap.appendChild(fill);
   cont.appendChild(barWrap);
   const xpinfo=document.createElement('div');xpinfo.className='battlepass-info';
-  xpinfo.textContent=battleLevel<50?`${battleXp} / ${xpForLevel(battleLevel)} XP`:'MAX';
+  xpinfo.textContent=battleLevel&lt;50?`${battleXp} / ${xpForLevel(battleLevel)} XP`:'MAX';
   cont.appendChild(xpinfo);
   const egginfo=document.createElement('div');egginfo.className='battlepass-info';
   egginfo.textContent=`Battlepass Eggs: ${battlepassEggs}`;
   cont.appendChild(egginfo);
-  if(battlepassEggs>0){
+  if(battlepassEggs&gt;0){
     const btn=document.createElement('button');btn.className='battlepass-button';
     btn.textContent='OPEN BATTLEPASS EGG';
     btn.onclick=openBattlepassEgg;
     cont.appendChild(btn);
   }
-  if(battleLevel>=50){
+  if(battleLevel&gt;=50){
     const resetBtn=document.createElement('button');resetBtn.className='battlepass-button';
     resetBtn.textContent='RESET BATTLEPASS';
-    resetBtn.onclick=()=>{
+    resetBtn.onclick=()=&gt;{
       if(confirm('Reset battlepass? Progress will be lost but you keep eggs.')){
         battleLevel=1;battleXp=0;battleResets++;
         renderBattlepass();saveGame();
@@ -1179,16 +1186,16 @@ function renderBattlepass(){
 }
 
 function openBattlepassEgg(){
-  if(battlepassEggs<=0) return;
+  if(battlepassEggs&lt;=0) return;
   battlepassEggs--;
   addBattleXp(5); // xp for opening battlepass egg
   // roll rarity (simple probabilities)
   const r=Math.random()*100;
   let rar='common';
-  if(r<1)rar='mythic';
-  else if(r<5)rar='legendary';
-  else if(r<15)rar='epic';
-  else if(r<35)rar='rare';
+  if(r&lt;1)rar='mythic';
+  else if(r&lt;5)rar='legendary';
+  else if(r&lt;15)rar='epic';
+  else if(r&lt;35)rar='rare';
   const petDefs={
     common:{name:'Battle Dog',ak:'battledog',cps:10},
     rare:{name:'Battle Tiger',ak:'battletiger',cps:30},
@@ -1231,17 +1238,17 @@ function confirmReset(){
   const yes=document.createElement('button');yes.className='hclose';
   yes.style.cssText='border-color:#ff4444;color:#ff4444;';
   yes.textContent='YES, RESET';
-  yes.onclick=()=>{
+  yes.onclick=()=&gt;{
     localStorage.removeItem(SAVE_KEY);
     location.reload();
   };
   const no=document.createElement('button');no.className='hclose';
   no.textContent='CANCEL';
-  no.onclick=()=>ov.style.display='none';
+  no.onclick=()=&gt;ov.style.display='none';
   row.appendChild(yes);row.appendChild(no);
   box.appendChild(title);box.appendChild(msg);box.appendChild(row);
   ov.appendChild(box);
-  ov.onclick=e=>{if(e.target===ov)ov.style.display='none';};
+  ov.onclick=e=&gt;{if(e.target===ov)ov.style.display='none';};
 }
 
 // Auto-save every 10 seconds
@@ -1255,6 +1262,8 @@ if(!username) showUsernameOverlay();
 if(username) updateLeaderboard(calcCps());
 renderBattlepass();
 if(!didLoad)saveGame(); // fresh save on first run
-</script>
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
 </body>
 </html>
