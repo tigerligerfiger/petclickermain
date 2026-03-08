@@ -1,1269 +1,417 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Index.html Source Code</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AlexRedefined — Chat Ranked</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --orange: #FF4500;
+    --bg: #080810;
+    --bg2: #0d0d0d;
+    --bg3: #111;
+  }
+  body { background: var(--bg); color: #fff; font-family: 'Bebas Neue', Impact, sans-serif; min-height: 100vh; }
+  ::-webkit-scrollbar { width: 3px; }
+  ::-webkit-scrollbar-thumb { background: var(--orange); border-radius: 2px; }
+  ::-webkit-scrollbar-track { background: #0a0a0a; }
+
+  /* Header */
+  #header { background: linear-gradient(90deg,#0d0500,#110a00,#0d0500); border-bottom: 1px solid #FF450022; padding: 0 20px; }
+  #header-inner { max-width: 880px; margin: 0 auto; }
+  #top-row { padding: 22px 0 0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  #logo { display: flex; align-items: center; gap: 14px; }
+  #logo-icon { font-size: 2.4rem; }
+  #title { font-size: 2.3rem; color: var(--orange); line-height: 1; letter-spacing: .08em; text-shadow: 0 0 28px #FF450077; }
+  #subtitle { font-family: 'Rajdhani', sans-serif; font-size: .78rem; color: #555; letter-spacing: .2em; font-weight: 700; text-transform: uppercase; }
+  #status-row { display: flex; align-items: center; gap: 10px; }
+  #status-dot { width: 8px; height: 8px; border-radius: 50%; background: #555; flex-shrink: 0; transition: background .3s; }
+  #status-dot.connected { background: #00ff87; animation: liveGlow 2s ease infinite; }
+  #status-dot.connecting { background: #FFD700; animation: pulse 1s ease infinite; }
+  #status-dot.error { background: #ff4444; }
+  #status-text { font-family: 'Rajdhani', sans-serif; font-size: .82rem; font-weight: 700; letter-spacing: .12em; color: #555; transition: color .3s; }
+  #connect-btn { background: var(--orange); border: none; border-radius: 7px; padding: 9px 20px; color: #fff; font-family: 'Bebas Neue', sans-serif; font-size: .95rem; letter-spacing: .1em; cursor: pointer; transition: all .15s; }
+  #connect-btn:hover { filter: brightness(1.15); transform: scale(1.02); }
+  #connect-btn.disconnect { background: #2a0000; border: 1px solid #550000; color: #ff6666; }
+
+  #stats-row { display: flex; gap: 28px; padding: 14px 0 0; flex-wrap: wrap; }
+  .stat-val { font-size: 1.3rem; color: var(--orange); }
+  .stat-label { font-family: 'Rajdhani', sans-serif; font-size: .7rem; color: #444; font-weight: 700; letter-spacing: .12em; margin-left: 6px; }
+
+  /* Tabs */
+  #tabs { display: flex; gap: 2px; margin-top: 14px; }
+  .tab { background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-family: 'Bebas Neue', sans-serif; letter-spacing: .1em; padding: 10px 22px; font-size: 1rem; color: #444; transition: all .2s; }
+  .tab.active { color: var(--orange); border-bottom: 2px solid var(--orange); }
+  .tab:hover:not(.active) { color: #888; }
+
+  /* Content */
+  #content { max-width: 880px; margin: 0 auto; padding: 28px 20px; }
+
+  /* Leaderboard */
+  #lb-list { display: flex; flex-direction: column; gap: 6px; }
+  .lb-row { background: #0c0c0c; border: 1px solid #181818; border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; transition: background .15s, border-color .15s; }
+  .lb-row:hover { background: rgba(255,69,0,.06); }
+  .lb-row.top { background: #0f0a00; }
+  .lb-pos { width: 32px; text-align: center; font-size: 1rem; color: #333; flex-shrink: 0; }
+  .lb-icon { font-size: 1.4rem; flex-shrink: 0; }
+  .lb-info { flex: 1; min-width: 0; }
+  .lb-name { font-size: 1.05rem; letter-spacing: .05em; color: #eee; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-wrap { display: flex; align-items: center; gap: 7px; margin-top: 4px; }
+  .bar-bg { background: #1a1a1a; border-radius: 20px; height: 3px; width: 100px; overflow: hidden; flex-shrink: 0; }
+  .bar-fill { height: 100%; border-radius: 20px; transition: width .8s cubic-bezier(.4,0,.2,1); }
+  .bar-rank { font-family: 'Rajdhani', sans-serif; font-size: .7rem; font-weight: 700; letter-spacing: .05em; }
+  .lb-elo { text-align: right; flex-shrink: 0; }
+  .lb-elo-val { font-size: 1.4rem; line-height: 1; }
+  .lb-elo-label { font-family: 'Rajdhani', sans-serif; font-size: .65rem; color: #333; font-weight: 700; letter-spacing: .1em; }
+
+  #lb-empty { text-align: center; padding: 70px 0; font-family: 'Rajdhani', sans-serif; color: #222; font-size: 1rem; font-weight: 700; letter-spacing: .15em; }
+
+  /* Live chat */
+  #chat-header { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  #chat-live-dot { width: 7px; height: 7px; border-radius: 50%; background: #222; flex-shrink: 0; }
+  #chat-live-dot.live { background: #00ff87; animation: pulse 1.2s ease infinite; }
+  #chat-label { font-family: 'Rajdhani', sans-serif; font-size: .8rem; color: #444; font-weight: 700; letter-spacing: .15em; }
+  #chat-feed { background: #0a0a0a; border: 1px solid #181818; border-radius: 12px; height: 480px; overflow-y: auto; padding: 12px 14px; display: flex; flex-direction: column; gap: 5px; }
+  #chat-empty { margin: auto; font-family: 'Rajdhani', sans-serif; color: #2a2a2a; font-size: .9rem; font-weight: 700; letter-spacing: .1em; text-align: center; }
+  .chat-entry { display: flex; gap: 7px; align-items: flex-start; animation: slideIn .25s ease; }
+  .chat-rank-icon { flex-shrink: 0; font-size: 13px; margin-top: 2px; }
+  .chat-username { font-size: .9rem; letter-spacing: .04em; flex-shrink: 0; }
+  .chat-elo { font-family: 'Rajdhani', sans-serif; font-size: .72rem; color: #2e2e2e; font-weight: 700; margin-top: 2px; flex-shrink: 0; }
+  .chat-msg { font-family: 'Rajdhani', sans-serif; font-size: .88rem; color: #999; font-weight: 600; word-break: break-word; }
+
+  /* Ranks */
+  #ranks-list { display: flex; flex-direction: column; gap: 12px; }
+  .rank-card { background: #0c0c0c; border-radius: 10px; border-left: 3px solid; padding: 18px 22px; display: flex; align-items: center; gap: 18px; }
+  .rank-card-icon { font-size: 2.2rem; }
+  .rank-card-info { flex: 1; }
+  .rank-card-name { font-size: 1.7rem; line-height: 1; }
+  .rank-card-range { font-family: 'Rajdhani', sans-serif; font-size: .8rem; color: #444; font-weight: 700; letter-spacing: .1em; }
+  .rank-card-count { text-align: center; background: #111; border-radius: 8px; padding: 8px 16px; min-width: 64px; }
+  .rank-count-val { font-size: 1.6rem; line-height: 1; }
+  .rank-count-label { font-family: 'Rajdhani', sans-serif; font-size: .65rem; color: #333; font-weight: 700; letter-spacing: .1em; }
+
+  /* Toast */
+  #toasts { position: fixed; top: 16px; right: 16px; display: flex; flex-direction: column; gap: 6px; z-index: 999; pointer-events: none; }
+  .toast { background: #111; border-radius: 8px; padding: 8px 14px; display: flex; align-items: center; gap: 8px; animation: gainPop 2.5s ease forwards; }
+  .toast-name { font-size: .95rem; letter-spacing: .05em; }
+  .toast-info { font-family: 'Rajdhani', sans-serif; font-size: .75rem; color: #555; font-weight: 700; }
+
+  @keyframes liveGlow { 0%,100%{box-shadow:0 0 8px #00ff8755} 50%{box-shadow:0 0 22px #00ff87aa} }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  @keyframes slideIn { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
+  @keyframes gainPop { 0%{opacity:0;transform:translateY(6px) scale(.9)} 15%{opacity:1;transform:translateY(0) scale(1)} 80%{opacity:1} 100%{opacity:0} }
+
+  .hidden { display: none !important; }
+</style>
 </head>
 <body>
-<pre>
-# &lt;!DOCTYPE html&gt;
-&lt;html lang="en"&gt;
-&lt;head&gt;
-&lt;meta charset="UTF-8"&gt;
-&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
-&lt;title&gt;Pet Hatcher&lt;/title&gt;
-&lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;
-&lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin&gt;
-&lt;link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;family=VT323:wght@400&amp;display=swap" rel="stylesheet"&gt;
-&lt;style&gt;
-:root{--bg:#0d0d1a;--panel:#13132a;--panel2:#1a1a35;--border:#2a2a5a;--gold:#ffd700;--goldDim:#a08800;--text:#e8e8ff;--textDim:#7878aa;--rare:#4488ff;--epic:#aa44ff;--legendary:#ff8800;--mythic:#ff44aa;
---px:'Press Start 2P',monospace;--vt:'VT323','Courier New',monospace;}
-*{box-sizing:border-box;margin:0;padding:0;}
-html,body{width:100%;min-height:100vh;}
-body{background:var(--bg);color:var(--text);font-family:'VT323','Courier New',monospace;font-size:18px;min-height:100vh;background-image:radial-gradient(ellipse at 20% 20%,#1a1040 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,#0a1a30 0%,transparent 50%);}
-h1{font-family:'Press Start 2P','Courier New',monospace;font-size:13px;text-align:center;padding:12px;background:linear-gradient(90deg,#ff44aa,#ffd700,#44aaff,#ff44aa);background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:rainbowShift 4s linear infinite;filter:drop-shadow(0 0 8px rgba(255,215,0,.4));}
-@keyframes rainbowShift{0%{background-position:0%}100%{background-position:300%}}
-.topbar{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;background:var(--panel);border-bottom:2px solid var(--border);flex-wrap:wrap;gap:8px;}
-.coins{font-family:'Press Start 2P','Courier New',monospace;font-size:11px;color:var(--gold);text-shadow:0 0 10px var(--goldDim);}
-.cps-disp{color:#44ff88;font-size:16px;}
-.main{display:grid;grid-template-columns:270px 1fr;gap:12px;padding:12px;max-width:1200px;margin:0 auto;align-items:start;}
-@media(max-width:700px){.main{grid-template-columns:1fr;}}
-.shop{background:var(--panel);border:2px solid var(--border);border-radius:4px;padding:12px;overflow-y:auto;max-height:90vh;}
-.shop h2{font-family:'Press Start 2P','Courier New',monospace;font-size:8px;color:var(--gold);text-align:center;margin-bottom:12px;letter-spacing:1px;}
-.egg-card{background:var(--panel2);border:2px solid var(--border);border-radius:3px;padding:8px;margin-bottom:8px;cursor:pointer;transition:all .12s;display:flex;gap:8px;align-items:center;}
-.egg-card:hover{border-color:var(--gold);transform:translateX(3px);}
-.egg-card.cant-afford{opacity:.4;cursor:not-allowed;}
-.egg-card.cant-afford:hover{border-color:var(--border);transform:none;}
-.egg-info .ename{font-family:'Press Start 2P','Courier New',monospace;font-size:7px;margin-bottom:3px;}
-.egg-info .ecost{font-size:16px;color:var(--gold);}
-.egg-info .eodds{font-size:12px;color:var(--textDim);line-height:1.5;}
-.collection{background:var(--panel);border:2px solid var(--border);border-radius:4px;padding:12px;overflow-y:auto;max-height:90vh;}
-.collection h2{font-family:'Press Start 2P','Courier New',monospace;font-size:8px;color:var(--gold);margin-bottom:10px;}
-.pet-grid{display:flex;flex-wrap:wrap;gap:10px;}
-.pet-slot{background:var(--panel2);border:2px solid #333;border-radius:4px;padding:8px;text-align:center;width:110px;}
-.pet-slot.common{border-color:#555;}
-.pet-slot.rare{border-color:var(--rare);box-shadow:0 0 6px #4488ff44;}
-.pet-slot.epic{border-color:var(--epic);box-shadow:0 0 8px #aa44ff44;}
-.pet-slot.legendary{border-color:var(--legendary);box-shadow:0 0 10px #ff880055;}
-.pet-slot.mythic{border-color:var(--mythic);box-shadow:0 0 12px #ff44aa66;animation:mythicGlow 2s ease-in-out infinite;}
-@keyframes mythicGlow{0%,100%{box-shadow:0 0 12px #ff44aa66}50%{box-shadow:0 0 24px #ff44aaaa}}
-.pet-slot canvas{image-rendering:pixelated;display:block;margin:0 auto;cursor:pointer;transition:transform .08s;}
-.pet-slot canvas:active{transform:scale(.88);}
-.pet-slot{user-select:none;-webkit-user-select:none;}
-.pname{font-size:13px;color:var(--text);margin-top:3px;line-height:1.2;pointer-events:none;}
-.pcount{font-family:'Press Start 2P','Courier New',monospace;font-size:6px;color:var(--textDim);pointer-events:none;}
-.pcps{font-size:12px;color:#44ff88;pointer-events:none;}
-/* MUTATION BADGE */
-.mut-badge{display:inline-block;font-family:'Press Start 2P','Courier New',monospace;font-size:5px;padding:1px 3px;border-radius:2px;margin-top:2px;letter-spacing:.5px;}
-.mut-badge.crystal{background:#001133;color:#44aaff;border:1px solid #44aaff;box-shadow:0 0 5px #44aaff66;}
-.mut-badge.void{background:#110022;color:#aa44ff;border:1px solid #aa44ff;box-shadow:0 0 5px #aa44ff66;}
-.mut-badge.celestial{background:#111100;color:#ffdd44;border:1px solid #ffdd44;box-shadow:0 0 5px #ffdd4466;}
-.mut-badge.infinite{background:#110011;color:#ff44ff;border:1px solid #ff44ff;box-shadow:0 0 8px #ff44ff88;}
-/* MUTATION EVENT BANNER */
-.mut-event-bar{position:fixed;bottom:0;left:0;right:0;z-index:800;pointer-events:none;display:flex;justify-content:center;padding-bottom:8px;}
-.mut-event-pill{font-family:'Press Start 2P','Courier New',monospace;font-size:9px;padding:8px 18px;border-radius:4px;border:2px solid;text-align:center;pointer-events:none;transition:all .3s;}
-.mut-event-pill.waiting{border-color:#2a2a5a;background:#13132a;color:#444;opacity:.7;}
-.mut-event-pill.warning{border-color:#ff8800;background:#1a0d00;color:#ff8800;animation:warnPulse 1s steps(1) infinite;box-shadow:0 0 20px #ff880066;}
-@keyframes warnPulse{0%,100%{opacity:1}50%{opacity:.5}}
-.mut-event-pill.active{border-color:#ff44ff;background:#1a001a;color:#ff88ff;animation:mutActivePulse 0.5s steps(1) infinite;box-shadow:0 0 30px #ff44ff88;}
-@keyframes mutActivePulse{0%,100%{box-shadow:0 0 30px #ff44ff88;border-color:#ff44ff}50%{box-shadow:0 0 60px #ff44ffcc;border-color:#ffaaff}}
-/* PET SLOT MUTATION OVERLAYS */
-.pet-slot.mut-crystal{box-shadow:0 0 10px #44aaff88 !important;}
-.pet-slot.mut-void{box-shadow:0 0 12px #aa44ffaa !important;}
-.pet-slot.mut-celestial{box-shadow:0 0 14px #ffdd44aa !important;animation:celestialGlow 1.5s ease-in-out infinite;}
-@keyframes celestialGlow{0%,100%{box-shadow:0 0 14px #ffdd44aa}50%{box-shadow:0 0 28px #ffdd44ee}}
-.pet-slot.mut-infinite{animation:infiniteGlow 1s linear infinite !important;}
-@keyframes infiniteGlow{0%{box-shadow:0 0 20px #ff44ffaa;border-color:#ff44ff}25%{box-shadow:0 0 20px #44aaffaa;border-color:#44aaff}50%{box-shadow:0 0 20px #44ffaaaa;border-color:#44ffaa}75%{box-shadow:0 0 20px #ffaa44aa;border-color:#ffaa44}100%{box-shadow:0 0 20px #ff44ffaa;border-color:#ff44ff}}
-.abtn{margin-top:4px;width:100%;padding:3px 0;font-family:'Press Start 2P','Courier New',monospace;font-size:6px;cursor:pointer;border:1px solid var(--border);background:var(--panel);color:var(--textDim);border-radius:2px;transition:all .12s;}
-.abtn:hover{border-color:var(--gold);color:var(--gold);}
-.abtn.on{border-color:#44ff88;color:#44ff88;background:#44ff8811;animation:aPulse 1s steps(1) infinite;}
-@keyframes aPulse{0%,100%{opacity:1}50%{opacity:.6}}
-.float-text{position:fixed;font-family:'Press Start 2P','Courier New',monospace;font-size:11px;color:var(--gold);pointer-events:none;z-index:999;animation:floatUp .9s ease-out forwards;text-shadow:0 0 8px var(--goldDim);}
-@keyframes floatUp{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-55px)}}
-.hatch-overlay{position:fixed;inset:0;background:rgba(0,0,0,.87);z-index:500;display:flex;align-items:center;justify-content:center;animation:fadeIn .2s ease;}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.hatch-box{background:var(--panel);border:3px solid var(--border);border-radius:4px;padding:28px 44px;text-align:center;animation:popIn .3s cubic-bezier(.34,1.56,.64,1);}
-@keyframes popIn{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
-.hatch-box canvas{image-rendering:pixelated;display:block;margin:12px auto;}
-.hrarity{font-family:'Press Start 2P','Courier New',monospace;font-size:13px;margin-bottom:6px;animation:rarPop .5s ease-out;}
-@keyframes rarPop{from{transform:scale(2.2);opacity:0}to{transform:scale(1);opacity:1}}
-.hname{font-family:'Press Start 2P','Courier New',monospace;font-size:9px;color:var(--text);margin-bottom:14px;}
-.hclose{padding:9px 26px;font-family:'Press Start 2P','Courier New',monospace;font-size:8px;cursor:pointer;border:2px solid var(--gold);background:transparent;color:var(--gold);border-radius:2px;letter-spacing:1px;transition:all .15s;}
-.hclose:hover{background:var(--gold);color:var(--bg);}
-.tab-row{display:flex;gap:4px;margin-bottom:10px;}
-.tab-btn{flex:1;padding:6px 4px;font-family:'Press Start 2P','Courier New',monospace;font-size:7px;cursor:pointer;border:2px solid var(--border);background:var(--panel2);color:var(--textDim);border-radius:3px;text-align:center;transition:all .12s;letter-spacing:.5px;}
-.tab-btn:hover{border-color:var(--gold);color:var(--gold);}
-.tab-btn.active{border-color:var(--gold);color:var(--gold);background:var(--panel);}
-.tab-panel{display:none;}
-.tab-panel.active{display:block;}
-.idx-section{margin-bottom:16px;}
-.idx-section-title{font-family:'Press Start 2P','Courier New',monospace;font-size:7px;color:var(--textDim);letter-spacing:1px;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border);}
-.idx-grid{display:flex;flex-wrap:wrap;gap:6px;}
-.idx-slot{width:76px;background:var(--panel2);border:2px solid #333;border-radius:3px;padding:5px;text-align:center;position:relative;transition:all .15s;}
-.idx-slot.found.common{border-color:#555;}
-.idx-slot.found.rare{border-color:var(--rare);box-shadow:0 0 5px #4488ff33;}
-.idx-slot.found.epic{border-color:var(--epic);box-shadow:0 0 6px #aa44ff33;}
-.idx-slot.found.legendary{border-color:var(--legendary);box-shadow:0 0 7px #ff880044;}
-.idx-slot.found.mythic{border-color:var(--mythic);box-shadow:0 0 10px #ff44aa55;animation:mythicGlow 2s ease-in-out infinite;}
-.idx-slot.undiscovered{border-color:#222;opacity:.6;}
-.idx-slot canvas{image-rendering:pixelated;display:block;margin:0 auto;}
-.idx-slot.undiscovered canvas{filter:brightness(0) opacity(.25);}
-.idx-name{font-size:11px;color:var(--text);margin-top:2px;line-height:1.2;}
-.idx-slot.undiscovered .idx-name{color:#444;}
-.idx-rarity{font-family:'Press Start 2P','Courier New',monospace;font-size:5px;margin-top:1px;}
-.idx-count-badge{position:absolute;top:2px;right:4px;font-family:'Press Start 2P','Courier New',monospace;font-size:6px;color:var(--gold);}
-.idx-progress{font-size:14px;color:var(--textDim);margin-bottom:10px;}
-.idx-progress span{color:var(--gold);font-family:'Press Start 2P','Courier New',monospace;font-size:10px;}
-@keyframes rainbowBorder{
-  0%{border-color:#ff0000;box-shadow:0 0 18px #ff000088;}
-  16%{border-color:#ff8800;box-shadow:0 0 18px #ff880088;}
-  33%{border-color:#ffff00;box-shadow:0 0 18px #ffff0088;}
-  50%{border-color:#00ff88;box-shadow:0 0 18px #00ff8888;}
-  66%{border-color:#00aaff;box-shadow:0 0 18px #00aaff88;}
-  83%{border-color:#aa44ff;box-shadow:0 0 18px #aa44ff88;}
-  100%{border-color:#ff0000;box-shadow:0 0 18px #ff000088;}
-}
-@keyframes rainbowText{
-  0%{color:#ff6666;}16%{color:#ffaa44;}33%{color:#ffff44;}50%{color:#44ffaa;}66%{color:#44aaff;}83%{color:#cc66ff;}100%{color:#ff6666;}
-}
-/* SHADOW KING */
-.pet-slot.shadowking{border-color:#6600cc;border-width:3px;box-shadow:0 0 18px #6600ccaa;animation:shadowGlow 2s ease-in-out infinite;}
-@keyframes shadowGlow{0%,100%{box-shadow:0 0 18px #6600ccaa;border-color:#6600cc}50%{box-shadow:0 0 36px #aa44ffcc;border-color:#aa44ff}}
-.pet-slot.shadowking .pname{color:#cc88ff;font-family:'Press Start 2P','Courier New',monospace;font-size:7px;}
-.pet-slot.shadowking .pcps{color:#cc88ff;}
-.idx-slot.found.shadowking{border-color:#6600cc;border-width:3px;box-shadow:0 0 14px #6600cc88;animation:shadowGlow 2s ease-in-out infinite;}
-.idx-slot.found.shadowking .idx-name{color:#cc88ff;}
-.idx-slot.found.shadowking .idx-rarity{color:#cc88ff;}
-/* QUESTS TAB */
-.quest-panel{padding:4px 0;}
-.quest-card{background:var(--panel2);border:2px solid var(--border);border-radius:4px;padding:14px 16px;margin-bottom:12px;}
-.quest-card.complete{border-color:#44ff88;box-shadow:0 0 8px #44ff8844;}
-.quest-card.locked{opacity:.5;}
-.quest-title{font-family:'Press Start 2P','Courier New',monospace;font-size:8px;color:var(--gold);margin-bottom:10px;letter-spacing:.5px;}
-.quest-line-title{font-family:'Press Start 2P','Courier New',monospace;font-size:9px;margin-bottom:14px;color:#cc88ff;text-shadow:0 0 8px #6600cc88;letter-spacing:1px;}
-.quest-task{margin-bottom:10px;}
-.quest-task-label{font-size:15px;color:var(--text);margin-bottom:4px;}
-.quest-task-label.done{color:#44ff88;}
-.quest-bar-wrap{background:#111;border:1px solid var(--border);border-radius:2px;height:12px;overflow:hidden;}
-.quest-bar-fill{height:100%;background:linear-gradient(90deg,#4400aa,#aa44ff);transition:width .4s;border-radius:2px;}
-.quest-bar-fill.done{background:linear-gradient(90deg,#226633,#44ff88);}
-.quest-bar-label{font-size:12px;color:var(--textDim);margin-top:2px;}
-.quest-reward{margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;}
-.quest-reward-label{font-family:'Press Start 2P','Courier New',monospace;font-size:7px;color:#cc88ff;}
-.quest-unlocked-banner{background:#0d001a;border:2px solid #6600cc;border-radius:4px;padding:10px 14px;text-align:center;font-family:'Press Start 2P','Courier New',monospace;font-size:8px;color:#cc88ff;box-shadow:0 0 16px #6600cc66;animation:shadowGlow 2s ease-in-out infinite;}
-.pet-slot.champion{border-width:3px;animation:rainbowBorder 2s linear infinite;}
-.pet-slot.champion .pname{animation:rainbowText 2s linear infinite;font-family:'Press Start 2P','Courier New',monospace;font-size:7px;}
-.pet-slot.champion .pcps{animation:rainbowText 2s linear infinite;}
-.pet-slot.champion .abtn.on{border-color:#fff;color:#fff;animation:rainbowBorder .5s linear infinite,aPulse 1s steps(1) infinite;}
-.idx-slot.found.champion{border-width:3px;animation:rainbowBorder 2s linear infinite;}
-.idx-slot.found.champion .idx-name{animation:rainbowText 2s linear infinite;}
-.idx-slot.found.champion .idx-rarity{animation:rainbowText 2s linear infinite;}
-.egg-card.champion-card{border-width:3px;animation:rainbowBorder 2s linear infinite;background:linear-gradient(135deg,#0d0d1a,#1a1035);}
-.egg-card.champion-card .ename{animation:rainbowText 2s linear infinite;}
-.egg-card.champion-card .ecost{font-size:14px;}
-.champ-label{font-family:'Press Start 2P','Courier New',monospace;font-size:8px;animation:rainbowText 2s linear infinite;margin-bottom:3px;}
-.hatch-box.champion{animation:popIn .3s cubic-bezier(.34,1.56,.64,1),rainbowBorder 1.5s linear infinite;}
-.hrarity.champion{animation:rainbowText 1s linear infinite;font-size:16px;}
-/* LEADERBOARD STYLES */
-.leaderboard{background:var(--panel);border:2px solid var(--border);border-radius:4px;padding:12px;overflow-y:auto;max-height:90vh;}
-.leaderboard h2{font-family:'Press Start 2P','Courier New',monospace;font-size:8px;color:var(--gold);text-align:center;margin-bottom:12px;letter-spacing:1px;}
-.leaderboard-entry{display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border-bottom:1px solid var(--border);font-size:12px;}
-.leaderboard-entry.current{background:#44ff8811;border-color:#44ff88;}
-.leaderboard-rank{font-family:'Press Start 2P','Courier New',monospace;font-size:8px;color:var(--gold);min-width:20px;text-align:center;}
-.leaderboard-name{color:var(--text);}
-.leaderboard-cps{font-family:'Press Start 2P','Courier New',monospace;font-size:7px;color:#44ff88;text-align:right;}
-/* USERNAME OVERLAY */
-.username-overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:1000;display:flex;align-items:center;justify-content:center;}
-.username-box{background:var(--panel);border:3px solid var(--border);border-radius:4px;padding:24px;text-align:center;max-width:400px;width:90%;}
-.username-title{font-family:'Press Start 2P','Courier New',monospace;font-size:10px;color:var(--gold);margin-bottom:16px;}
-.username-input{width:100%;padding:8px;font-family:'Press Start 2P','Courier New',monospace;font-size:8px;text-align:center;border:2px solid var(--border);background:var(--panel2);color:var(--text);border-radius:2px;margin-bottom:8px;}
-.username-input:focus{outline:none;border-color:var(--gold);}
-.username-error{font-size:12px;color:#ff4444;margin-bottom:12px;min-height:16px;}
-.username-submit{padding:8px 16px;font-family:'Press Start 2P','Courier New',monospace;font-size:7px;cursor:pointer;border:2px solid var(--gold);background:transparent;color:var(--gold);border-radius:2px;transition:all .15s;}
-.username-submit:hover{background:var(--gold);color:var(--bg);}
-.username-submit:disabled{opacity:.5;cursor:not-allowed;border-color:#555;color:#555;}
-.username-submit:disabled:hover{background:transparent;color:#555;}
-/* BATTLEPASS STYLES */
-.battlepass{background:var(--panel);border:2px solid var(--border);border-radius:4px;padding:12px;overflow-y:auto;max-height:90vh;}
-.battlepass h2{font-family:'Press Start 2P','Courier New',monospace;font-size:8px;color:var(--gold);text-align:center;margin-bottom:12px;letter-spacing:1px;}
-.battlepass-bar{background:#111;border:1px solid var(--border);border-radius:4px;overflow:hidden;height:16px;margin:8px 0;}
-.battlepass-fill{height:100%;background:#44ff88;width:0%;}
-.battlepass-info{font-size:12px;color:var(--text);margin-bottom:6px;}
-.battlepass-button{padding:6px 12px;font-family:'Press Start 2P','Courier New',monospace;font-size:7px;cursor:pointer;border:2px solid var(--gold);background:transparent;color:var(--gold);border-radius:2px;transition:all .15s;}
-.battlepass-button:hover{background:var(--gold);color:var(--bg);}
-&lt;/style&gt;
-&lt;/head&gt;
-&lt;body&gt;
-&lt;h1&gt;pethatcher&lt;/h1&gt;
-&lt;div class="topbar"&gt;
-  &lt;div class="coins"&gt;💰 &lt;span id="coinDisplay"&gt;0&lt;/span&gt; COINS&lt;/div&gt;
-  &lt;div class="cps-disp" id="cpsDisplay"&gt;0 CPS&lt;/div&gt;
-  &lt;div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;"&gt;
-    &lt;span style="font-size:14px;color:var(--textDim)"&gt;Click pets • Toggle AUTO&lt;/span&gt;
-    &lt;span id="saveIndicator" style="font-family:'Press Start 2P',monospace;font-size:7px;color:#44ff88;opacity:0;transition:opacity .4s;"&gt;💾 SAVED&lt;/span&gt;
-    &lt;button onclick="confirmReset()" style="font-family:'Press Start 2P',monospace;font-size:6px;padding:4px 8px;cursor:pointer;border:1px solid #333;background:transparent;color:#444;border-radius:2px;transition:all .15s;" onmouseover="this.style.borderColor='#ff4444';this.style.color='#ff4444'" onmouseout="this.style.borderColor='#333';this.style.color='#444'"&gt;RESET&lt;/button&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;div class="main"&gt;
-  &lt;div class="shop"&gt;&lt;h2&gt;🥚 EGG SHOP&lt;/h2&gt;&lt;div id="eggShop"&gt;&lt;/div&gt;&lt;/div&gt;
-  &lt;div class="collection"&gt;
-    &lt;div class="tab-row"&gt;
-      &lt;button class="tab-btn active" id="tabBtnCollection" onclick="switchTab('collection')"&gt;🐾 MY PETS&lt;/button&gt;
-      &lt;button class="tab-btn" id="tabBtnIndex" onclick="switchTab('index')"&gt;📖 PET INDEX&lt;/button&gt;
-      &lt;button class="tab-btn" id="tabBtnQuests" onclick="switchTab('quests')"&gt;⚔️ QUESTS&lt;/button&gt;
-      &lt;button class="tab-btn" id="tabBtnLeaderboard" onclick="switchTab('leaderboard')"&gt;🏆 LEADERBOARD&lt;/button&gt;
-      &lt;button class="tab-btn" id="tabBtnBattlepass" onclick="switchTab('battlepass')"&gt;📜 BATTLEPASS&lt;/button&gt;
-    &lt;/div&gt;
-    &lt;div class="tab-panel active" id="tabCollection"&gt;&lt;div class="pet-grid" id="petGrid"&gt;&lt;/div&gt;&lt;/div&gt;
-    &lt;div class="tab-panel" id="tabIndex"&gt;
-      &lt;div class="idx-progress"&gt;Discovered: &lt;span id="idxCount"&gt;0&lt;/span&gt; / &lt;span id="idxTotal"&gt;0&lt;/span&gt;&lt;/div&gt;
-      &lt;div id="idxContent"&gt;&lt;/div&gt;
-    &lt;/div&gt;
-    &lt;div class="tab-panel" id="tabQuests"&gt;&lt;div class="quest-panel" id="questContent"&gt;&lt;/div&gt;&lt;/div&gt;
-    &lt;div class="tab-panel" id="tabLeaderboard"&gt;&lt;div class="leaderboard" id="leaderboardContent"&gt;&lt;/div&gt;&lt;/div&gt;
-    &lt;div class="tab-panel" id="tabBattlepass"&gt;&lt;div class="battlepass" id="battlepassContent"&gt;&lt;/div&gt;&lt;/div&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;div id="hatchOverlay" class="hatch-overlay" style="display:none"&gt;&lt;/div&gt;
-&lt;div id="usernameOverlay" class="username-overlay" style="display:none"&gt;
-  &lt;div class="username-box"&gt;
-    &lt;div class="username-title"&gt;CREATE USERNAME&lt;/div&gt;
-    &lt;input type="text" id="usernameInput" class="username-input" placeholder="Enter username..." maxlength="16"&gt;
-    &lt;div id="usernameError" class="username-error"&gt;&lt;/div&gt;
-    &lt;button id="usernameSubmit" class="username-submit" disabled&gt;CREATE&lt;/button&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;div class="mut-event-bar"&gt;
-  &lt;div class="mut-event-pill waiting" id="mutPill"&gt;⬡ MUTATION EVENT — next in &lt;span id="mutTimer"&gt;--:--&lt;/span&gt;&lt;/div&gt;
-&lt;/div&gt;
-&lt;script&gt;
-const N=null;
-function px(ctx,pixels,w,sc,ox,oy){
-  ox=ox||0;oy=oy||0;
-  for(let i=0;i&lt;pixels.length;i++){
-    const c=pixels[i];if(!c)continue;
-    ctx.fillStyle=c;
-    ctx.fillRect((i%w)*sc+ox,Math.floor(i/w)*sc+oy,sc,sc);
-  }
-}
-const A={};
-A.dog=[N,N,N,N,'#8B5E3C','#8B5E3C','#8B5E3C','#8B5E3C','#8B5E3C','#8B5E3C','#8B5E3C','#8B5E3C',N,N,N,N,N,N,N,'#5a3010','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#5a3010',N,N,N,N,N,'#5a3010','#C4874A','#C4874A','#111','#C4874A','#C4874A','#C4874A','#111','#C4874A','#C4874A','#C4874A','#5a3010',N,N,N,N,'#5a3010','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#5a3010',N,N,N,N,'#5a3010','#C4874A','#f4d090','#f4d090','#f4d090','#f4d090','#f4d090','#f4d090','#f4d090','#C4874A','#C4874A','#5a3010',N,N,N,N,N,'#5a3010','#C4874A','#C4874A','#ff6688','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#5a3010',N,N,N,N,N,N,'#5a3010','#5a3010','#5a3010','#5a3010','#5a3010','#5a3010','#5a3010','#5a3010',N,N,N,N,N,N,'#5a3010','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#5a3010',N,N,N,'#5a3010','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#5a3010',N,N,'#5a3010','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#C4874A','#5a3010',N,N,N,'#5a3010','#5a3010','#5a3010','#5a3010','#5a3010','#5a3010','#5a3010','#5a3010','#5a3010','#5a3010','#5a3010','#5a3010',N,N,N,N,'#5a3010','#C4874A',N,N,'#5a3010','#C4874A','#C4874A','#5a3010',N,N,'#C4874A','#5a3010',N,N,N,N,'#5a3010','#C4874A',N,N,'#5a3010','#C4874A','#C4874A','#5a3010',N,N,'#C4874A','#5a3010',N,N,N,N,'#3a1a00','#3a1a00',N,N,'#3a1a00','#3a1a00','#3a1a00','#3a1a00',N,N,'#3a1a00','#3a1a00',N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N];
-A.rabbit=[N,N,'#c9a87c','#c9a87c',N,N,N,N,N,N,'#c9a87c','#c9a87c',N,N,N,N,N,'#c9a87c','#ffe8c8','#ffe8c8','#c9a87c',N,N,N,N,'#c9a87c','#ffe8c8','#ffe8c8','#c9a87c',N,N,N,N,'#c9a87c','#ffb6c1','#ffb6c1','#c9a87c',N,N,N,N,'#c9a87c','#ffb6c1','#ffb6c1','#c9a87c',N,N,N,N,N,'#c9a87c','#ffe8c8','#c9a87c',N,N,N,N,N,'#ffe8c8','#c9a87c',N,N,N,N,N,N,'#c9a87c','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#c9a87c',N,N,N,N,N,N,'#c9a87c','#ffe8c8','#ffe8c8','#111','#ffe8c8','#ffe8c8','#111','#ffe8c8','#ffe8c8','#ffe8c8','#c9a87c',N,N,N,N,N,'#c9a87c','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#c9a87c',N,N,N,N,N,'#c9a87c','#ffe8c8','#ffb6c1','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffb6c1','#ffe8c8','#c9a87c',N,N,N,N,N,N,'#c9a87c','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#c9a87c',N,N,N,N,N,N,'#c9a87c','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#c9a87c',N,N,N,N,'#c9a87c','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#c9a87c',N,N,N,'#c9a87c','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#ffe8c8','#c9a87c',N,N,N,N,'#c9a87c','#c9a87c','#c9a87c','#c9a87c','#c9a87c','#c9a87c','#c9a87c','#c9a87c','#c9a87c','#c9a87c','#c9a87c','#c9a87c',N,N,N,N,'#c9a87c','#ffe8c8',N,N,N,N,N,N,N,N,N,N,'#ffe8c8','#c9a87c',N,N,N,N,'#a07040','#a07040',N,N,N,N,N,N,N,N,N,N,'#a07040','#a07040',N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N];
-A.cat=[N,N,'#d46b00','#d46b00',N,N,N,N,N,N,'#d46b00','#d46b00',N,N,N,N,N,'#d46b00','#ff9900','#ff9900','#d46b00',N,N,N,N,'#d46b00','#ff9900','#ff9900','#d46b00',N,N,N,N,'#d46b00','#ffbb44','#ffbb44','#d46b00',N,N,N,N,'#d46b00','#ffbb44','#ffbb44','#d46b00',N,N,N,N,N,'#d46b00','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#d46b00',N,N,N,N,N,N,'#d46b00','#ff9900','#111','#ffcc88','#ff9900','#ff9900','#ffcc88','#111','#ff9900','#ff9900','#d46b00',N,N,N,N,N,'#d46b00','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#d46b00',N,N,N,N,N,N,'#d46b00','#ff9900','#ff9900','#ff6688','#ff9900','#ff6688','#ff9900','#ff9900','#d46b00',N,N,N,N,N,N,N,'#d46b00','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#d46b00',N,N,N,N,N,N,'#d46b00','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#d46b00',N,N,N,N,'#d46b00','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#d46b00',N,N,N,'#d46b00','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#d46b00',N,N,N,N,N,'#d46b00','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#d46b00',N,N,N,N,N,N,'#d46b00','#d46b00','#d46b00',N,N,N,'#d46b00','#d46b00','#d46b00',N,N,N,N,N,N,'#d46b00','#ff9900',N,N,N,N,N,N,N,'#ff9900','#d46b00',N,N,N,N,N,N,'#a05000','#a05000',N,N,N,N,N,N,N,'#a05000','#a05000',N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N];
-A.fox=[N,N,'#88ccff','#88ccff',N,N,N,N,N,N,'#88ccff','#88ccff',N,N,N,N,N,'#5599cc','#88ccff','#88ccff','#5599cc',N,N,N,N,'#5599cc','#88ccff','#88ccff','#5599cc',N,N,N,N,'#5599cc','#cceeff','#cceeff','#5599cc',N,N,N,N,'#5599cc','#cceeff','#cceeff','#5599cc',N,N,N,N,N,'#5599cc','#88ccff','#5599cc',N,N,N,N,N,'#88ccff','#5599cc',N,N,N,N,N,N,'#5599cc','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#5599cc',N,N,N,N,N,N,'#5599cc','#88ccff','#112244','#cceeff','#88ccff','#88ccff','#cceeff','#112244','#88ccff','#88ccff','#5599cc',N,N,N,N,N,'#5599cc','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#5599cc',N,N,N,N,N,N,'#5599cc','#cceeff','#ff88cc','#88ccff','#88ccff','#ff88cc','#cceeff','#5599cc',N,N,N,N,N,N,N,N,'#5599cc','#88ccff','#88ccff','#cceeff','#88ccff','#88ccff','#cceeff','#88ccff','#88ccff','#88ccff','#5599cc',N,N,N,N,'#5599cc','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#5599cc',N,N,'#5599cc','#cceeff','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#cceeff','#5599cc',N,N,'#5599cc','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#88ccff','#5599cc',N,N,N,N,'#5599cc','#5599cc','#5599cc','#5599cc',N,N,N,'#5599cc','#5599cc','#5599cc','#5599cc',N,N,N,N,N,'#5599cc','#88ccff',N,N,N,N,N,N,N,'#88ccff','#5599cc',N,N,N,N,N,N,'#336699','#336699',N,N,N,N,N,N,N,'#336699','#336699',N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N];
-A.wolf=[N,N,'#4400aa','#4400aa',N,N,N,N,N,N,'#4400aa','#4400aa',N,N,N,N,N,'#4400aa','#7722ff','#7722ff','#4400aa',N,N,N,N,'#4400aa','#7722ff','#7722ff','#4400aa',N,N,N,N,'#220055','#7722ff','#aa55ff','#4400aa',N,N,N,N,'#4400aa','#aa55ff','#7722ff','#220055',N,N,N,N,N,'#4400aa','#7722ff','#4400aa',N,N,N,N,N,'#7722ff','#4400aa',N,N,N,N,N,N,'#4400aa','#7722ff','#7722ff','#7722ff','#7722ff','#7722ff','#7722ff','#7722ff','#4400aa',N,N,N,N,N,N,'#4400aa','#7722ff','#aa55ff','#ffddff','#ffddff','#7722ff','#ffddff','#ffddff','#aa55ff','#7722ff','#4400aa',N,N,N,N,N,'#4400aa','#7722ff','#7722ff','#110033','#aa55ff','#7722ff','#aa55ff','#110033','#7722ff','#7722ff','#4400aa',N,N,N,N,N,N,'#4400aa','#7722ff','#7722ff','#ff88aa','#7722ff','#ff88aa','#7722ff','#7722ff','#4400aa',N,N,N,N,N,N,'#4400aa','#7722ff','#7722ff','#7722ff','#7722ff','#7722ff','#7722ff','#7722ff','#7722ff','#7722ff','#4400aa',N,N,N,N,'#4400aa','#7722ff','#aa55ff','#7722ff','#7722ff','#7722ff','#7722ff','#7722ff','#7722ff','#7722ff','#aa55ff','#7722ff','#4400aa',N,N,'#4400aa','#7722ff','#aa55ff','#7722ff','#7722ff','#7722ff','#7722ff','#7722ff','#7722ff','#7722ff','#7722ff','#aa55ff','#7722ff','#4400aa',N,N,'#4400aa','#7722ff','#7722ff','#7722ff','#7722ff','#7722ff','#7722ff','#7722ff','#7722ff','#7722ff','#7722ff','#7722ff','#7722ff','#4400aa',N,N,N,N,'#4400aa','#4400aa','#4400aa','#4400aa',N,N,N,'#4400aa','#4400aa','#4400aa','#4400aa',N,N,N,N,N,'#4400aa','#7722ff',N,N,N,N,N,N,N,'#7722ff','#4400aa',N,N,N,N,N,N,'#220044','#220044',N,N,N,N,N,N,N,'#220044','#220044',N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N];
-A.dragon=[N,N,N,'#cc0044','#cc0044',N,N,N,N,N,'#cc0044','#cc0044',N,N,N,N,N,N,'#cc0044','#ff2266','#ff2266','#cc0044',N,N,'#cc0044','#ff2266','#ff2266','#cc0044',N,N,N,N,N,'#cc0044','#ff4488','#ff4488','#cc0044',N,N,'#cc0044','#ff4488','#ff4488','#cc0044',N,N,N,N,'#ffaa00','#ffaa00',N,'#cc0044','#ff2266','#ff2266','#ff2266','#ff2266','#ff2266','#cc0044',N,'#ffaa00','#ffaa00',N,N,'#cc0044','#ff2266','#ff4488','#cc0044','#ff2266','#ff4488','#ff2266','#ff2266','#ff2266','#ff4488','#ff2266','#cc0044','#ff4488','#ff2266','#cc0044',N,N,'#cc0044','#ff2266','#ff2266','#ff4488','#111','#ff2266','#ff2266','#ff2266','#111','#ff4488','#ff2266','#ff2266','#cc0044',N,N,N,N,'#cc0044','#ff2266','#ff4488','#ff2266','#ff2266','#ff2266','#ff2266','#ff2266','#ff4488','#ff2266','#cc0044',N,N,N,N,N,N,'#cc0044','#ff2266','#ff8800','#ff2266','#ff2266','#ff2266','#ff8800','#ff2266','#cc0044',N,N,N,N,N,N,'#cc0044','#ff2266','#ff2266','#ff2266','#ff2266','#ff2266','#ff2266','#ff2266','#ff2266','#ff2266','#cc0044',N,N,N,N,'#cc0044','#ff2266','#ff4488','#ff2266','#ff2266','#ff2266','#ff2266','#ff2266','#ff2266','#ff4488','#ff2266','#ff2266','#cc0044',N,N,'#cc0044','#ff2266','#ff2266','#ff2266','#ff2266','#ff2266','#ff2266','#ff2266','#ff2266','#ff2266','#ff2266','#ff2266','#ff2266','#cc0044',N,N,N,N,'#cc0044','#cc0044','#cc0044','#cc0044',N,N,N,'#cc0044','#cc0044','#cc0044','#cc0044',N,N,N,N,N,'#cc0044','#ff2266',N,N,N,N,N,N,N,'#ff2266','#cc0044',N,N,N,N,N,N,'#880022','#880022',N,N,N,N,N,N,N,'#880022','#880022',N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N];
-A.parrot=[N,N,N,N,'#006600','#006600',N,N,N,'#006600',N,N,N,N,N,N,N,N,N,'#006600','#00cc00','#00cc00','#006600',N,'#006600','#00cc00','#006600',N,N,N,N,N,N,N,'#006600','#00cc00','#00cc00','#00cc00','#006600',N,'#006600','#00cc00','#00cc00','#006600',N,N,N,N,N,'#006600','#00cc00','#00cc00','#ffdd00','#00cc00','#00cc00','#00cc00','#00cc00','#ffdd00','#00cc00','#006600',N,N,N,N,N,'#006600','#00cc00','#111','#00cc00','#00cc00','#00cc00','#00cc00','#111','#00cc00','#00cc00','#006600',N,N,N,N,N,N,'#006600','#00cc00','#00cc00','#00cc00','#00cc00','#00cc00','#00cc00','#00cc00','#006600',N,N,N,N,N,N,N,N,'#006600','#00cc00','#ff4444','#00cc00','#00cc00','#ff4444','#00cc00','#006600',N,N,N,N,N,N,N,N,N,N,'#006600','#ffdd00','#ffdd00','#ffdd00','#ffdd00','#006600',N,N,N,N,N,N,N,N,N,N,'#006600','#00cc00','#00cc00','#00cc00','#00cc00','#00cc00','#006600',N,N,N,N,N,N,N,N,N,'#ffaa00','#006600','#00cc00','#00cc00','#00cc00','#00cc00','#006600','#ffaa00','#ff6600',N,N,N,N,N,N,N,'#ffaa00','#ffcc00','#006600','#00cc00','#00cc00','#00cc00','#006600','#ffcc00','#ffaa00',N,N,N,N,N,N,N,N,'#006600','#006600','#006600','#006600','#006600','#006600','#006600',N,N,N,N,N,N,N,N,N,N,'#006600','#00aa00',N,N,N,N,'#00aa00','#006600',N,N,N,N,N,N,N,N,N,'#004400','#006600',N,N,N,N,'#006600','#004400',N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N];
-A.tiger=[N,N,'#cc7700','#cc7700',N,'#331100','#cc7700','#cc7700','#cc7700','#331100',N,'#cc7700','#cc7700',N,N,N,N,'#cc7700','#ff9900','#ff9900','#cc7700','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#cc7700','#ff9900','#ff9900','#cc7700',N,N,N,'#cc7700','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#cc7700',N,N,N,N,'#cc7700','#ff9900','#331100','#ff9900','#ffffcc','#ff9900','#ffffcc','#ff9900','#331100','#ff9900','#cc7700',N,N,N,N,N,'#cc7700','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#cc7700',N,N,N,N,N,N,'#cc7700','#ff9900','#ff9900','#ff6699','#ff9900','#ff6699','#ff9900','#ff9900','#cc7700',N,N,N,N,N,N,'#cc7700','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#cc7700',N,N,N,N,'#cc7700','#ff9900','#331100','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#331100','#ff9900','#ff9900','#cc7700',N,N,'#cc7700','#ff9900','#ff9900','#331100','#ff9900','#ff9900','#ff9900','#ff9900','#331100','#ff9900','#ff9900','#ff9900','#cc7700',N,N,N,N,'#cc7700','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#ff9900','#cc7700',N,N,N,N,N,N,'#cc7700','#cc7700','#cc7700',N,N,N,'#cc7700','#cc7700','#cc7700',N,N,N,N,N,N,'#cc7700','#ff9900',N,N,N,N,N,N,N,'#ff9900','#cc7700',N,N,N,N,N,N,'#cc7700','#ff9900',N,N,N,N,N,N,N,'#ff9900','#cc7700',N,N,N,N,N,N,'#884400','#884400',N,N,N,N,N,N,N,'#884400','#884400',N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N];
-A.chameleon=[N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,'#00cc88','#00ffaa','#00ffaa','#00cc88',N,N,N,N,N,N,N,N,N,N,'#00cc88','#00ffaa','#00ffaa','#00ffaa','#00ffaa','#00cc88',N,N,N,N,N,N,N,N,'#00cc88','#00ffaa','#111','#00ffaa','#111','#00ffaa','#00cc88',N,N,N,N,N,N,N,'#00cc88','#00ffaa','#00ffaa','#00ffaa','#00ffaa','#00ffaa','#00ffaa','#00ffaa','#00cc88',N,N,N,N,N,N,'#00cc88','#00ffaa','#aaff44','#00ffaa','#ff44aa','#00ffaa','#ff44aa','#00ffaa','#aaff44','#00ffaa','#00cc88',N,N,N,N,'#00cc88','#00ffaa','#00ffaa','#00ffaa','#00ffaa','#00ffaa','#00ffaa','#00ffaa','#00ffaa','#00ffaa','#00ffaa','#00ffaa','#00cc88',N,N,N,N,'#00cc88','#00ffaa','#00ffaa','#00ffaa','#00ffaa','#00ffaa','#00ffaa','#00ffaa','#00ffaa','#00ffaa','#00ffaa','#00cc88',N,N,N,N,N,N,'#00cc88','#00ffaa','#00ffaa','#00ffaa','#00ffaa','#00ffaa','#00ffaa','#00ffaa','#00cc88',N,N,N,N,N,N,N,'#00cc88','#00ffaa','#00ffaa','#00ffaa','#00ffaa','#00ffaa','#00ffaa','#00cc88',N,N,N,N,N,N,N,N,'#00cc88','#00ffaa','#00ffaa','#00ffaa','#00ffaa','#00cc88',N,N,N,N,N,N,N,N,N,N,N,'#00cc88','#00ffaa','#00ffaa','#00cc88',N,N,N,N,N,N,N,N,N,N,'#00cc88','#00ffaa',N,'#00ffaa','#00cc88',N,N,N,N,N,N,N,N,N,N,'#00cc88','#00ffaa',N,N,N,'#00ffaa','#00cc88',N,N,N,N,N,N,N,N,'#007744','#007744',N,N,N,'#007744','#007744',N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N];
-A.panther=[N,N,'#aa8800','#aa8800',N,N,N,N,N,N,'#aa8800','#aa8800',N,N,N,N,N,'#aa8800','#ffcc00','#ffcc00','#aa8800',N,N,N,N,'#aa8800','#ffcc00','#ffcc00','#aa8800',N,N,N,N,'#aa8800','#ffee88','#ffee88','#aa8800',N,N,N,N,'#aa8800','#ffee88','#ffee88','#aa8800',N,N,N,N,N,'#aa8800','#ffcc00','#aa8800',N,N,N,N,N,'#ffcc00','#aa8800',N,N,N,N,N,N,'#aa8800','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#aa8800',N,N,N,N,N,N,'#aa8800','#ffcc00','#111','#ffee88','#ffcc00','#ffcc00','#ffee88','#111','#ffcc00','#ffcc00','#aa8800',N,N,N,N,N,'#aa8800','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#aa8800',N,N,N,N,N,N,'#aa8800','#ffcc00','#ff8800','#ffcc00','#ffcc00','#ff8800','#ffcc00','#ffcc00','#aa8800',N,N,N,N,N,N,'#aa8800','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#aa8800',N,N,N,N,'#aa8800','#ffcc00','#ffee88','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffee88','#ffcc00','#ffcc00','#ffcc00','#aa8800',N,N,'#aa8800','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#aa8800',N,N,N,'#aa8800','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#ffcc00','#aa8800',N,N,N,N,N,N,'#aa8800','#aa8800','#aa8800',N,N,N,'#aa8800','#aa8800','#aa8800',N,N,N,N,N,N,'#aa8800','#ffcc00',N,N,N,N,N,N,N,'#ffcc00','#aa8800',N,N,N,N,N,N,'#775500','#775500',N,N,N,N,N,N,N,'#775500','#775500',N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N];
-A.behemoth=[N,'#006644','#006644',N,N,N,N,N,N,N,N,'#006644','#006644',N,N,N,'#006644','#00aa66','#00aa66','#006644',N,N,N,N,N,N,'#006644','#00aa66','#00aa66','#006644',N,N,'#006644','#00cc77','#00cc77','#006644','#006644',N,N,N,N,'#006644','#006644','#00cc77','#00cc77','#006644',N,N,N,'#006644','#00aa66','#00cc77','#00cc77','#006644',N,N,'#006644','#00cc77','#00aa66','#00aa66','#006644',N,N,N,N,N,'#006644','#00cc77','#111','#00cc77','#006644','#006644','#00cc77','#111','#00cc77','#006644',N,N,N,N,N,'#006644','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#006644',N,N,N,N,'#006644','#00cc77','#44ff99','#00cc77','#ffdd44','#00cc77','#00cc77','#ffdd44','#00cc77','#44ff99','#00cc77','#006644',N,N,N,'#006644','#00cc77','#44ff99','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#44ff99','#00cc77','#006644',N,N,'#006644','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#006644',N,N,'#006644','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#006644',N,N,N,'#006644','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#00cc77','#006644',N,N,N,N,N,'#006644','#006644','#006644','#006644','#006644','#006644','#006644','#006644','#006644','#006644',N,N,N,N,N,'#006644','#00aa66',N,N,N,N,N,N,'#00aa66','#006644',N,N,N,N,N,'#006644','#00aa66',N,N,N,N,N,N,'#00aa66','#006644',N,N,N,N,N,'#004422','#004422',N,N,N,N,N,N,'#004422','#004422',N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N];
-A.fish=[N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,'#0044aa','#0044aa','#0044aa',N,N,N,N,N,N,N,N,N,N,'#0044aa','#0044aa',N,'#0044aa','#0077ee','#0077ee','#0044aa',N,N,N,N,N,N,N,N,'#0044aa','#0077ee','#0077ee','#0044aa','#0077ee','#88ccff','#111','#88ccff','#0044aa',N,N,N,N,N,N,N,'#0044aa','#0077ee','#0077ee','#0044aa','#0077ee','#88ccff','#0077ee','#0044aa','#0044aa',N,N,N,N,N,N,N,'#0044aa','#0077ee','#0077ee','#0044aa','#0077ee','#ff8800','#0077ee','#0044aa',N,N,N,N,N,N,N,N,N,'#0044aa','#0044aa',N,'#0044aa','#0077ee','#0077ee','#0044aa',N,N,N,N,N,N,N,N,N,N,N,N,'#0044aa','#0044aa','#0044aa',N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N];
-A.seahorse=[N,N,N,N,N,'#00aacc','#00aacc',N,N,N,N,N,N,N,N,N,N,N,N,N,'#00aacc','#00ddff','#00ddff','#00aacc',N,N,N,N,N,N,N,N,N,N,N,'#00aacc','#00ddff','#00ddff','#00ddff','#00ddff','#00aacc',N,N,N,N,N,N,N,N,'#00aacc','#00ddff','#111','#00ddff','#111','#00ddff','#00aacc',N,N,N,N,N,N,N,N,N,'#00aacc','#00ddff','#00ddff','#00ddff','#00aacc',N,N,N,N,N,N,N,N,N,N,'#00aacc','#00ddff','#ffcc00','#00ddff','#00aacc',N,N,N,N,N,N,N,N,N,'#00aacc','#00ddff','#00ddff','#00ddff','#00ddff','#00ddff','#00aacc',N,N,N,N,N,N,N,'#00aacc','#00ddff','#00ddff','#00ddff','#00ddff','#00ddff','#00ddff','#00aacc',N,N,N,N,N,N,N,'#00aacc','#00ddff','#00ddff','#00ddff','#00ddff','#00ddff','#00aacc',N,N,N,N,N,N,N,N,'#00aacc','#00ddff','#00ddff','#00ddff','#00aacc',N,N,N,N,N,N,N,N,N,N,'#00aacc','#00ddff','#00ddff','#00aacc','#00aacc',N,N,N,N,N,N,N,N,N,N,'#00aacc','#00ddff','#00aacc',N,N,N,N,N,N,N,N,N,N,N,N,N,'#00aacc',N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N];
-A.eel=[N,N,N,N,N,N,N,'#4400aa','#4400aa',N,N,N,N,N,N,N,N,N,N,N,N,N,'#4400aa','#7722ff','#7722ff','#4400aa',N,N,N,N,N,N,N,N,N,N,N,'#4400aa','#aa44ff','#7722ff','#aa44ff','#7722ff','#4400aa',N,N,N,N,N,N,N,N,'#4400aa','#aa44ff','#ffff44','#7722ff','#ffff44','#aa44ff','#7722ff','#4400aa',N,N,N,N,N,N,N,'#4400aa','#aa44ff','#7722ff','#111','#7722ff','#111','#7722ff','#aa44ff','#7722ff','#4400aa',N,N,N,N,N,N,'#4400aa','#aa44ff','#7722ff','#aa44ff','#7722ff','#7722ff','#7722ff','#aa44ff','#7722ff','#aa44ff','#7722ff','#4400aa',N,N,N,'#4400aa','#aa44ff','#7722ff','#aa44ff','#7722ff','#aa44ff','#7722ff','#aa44ff','#7722ff','#aa44ff','#7722ff','#aa44ff','#7722ff','#4400aa',N,N,N,'#4400aa','#aa44ff','#7722ff','#aa44ff','#7722ff','#aa44ff','#7722ff','#aa44ff','#7722ff','#aa44ff','#7722ff','#4400aa',N,N,N,N,'#4400aa','#7722ff','#aa44ff','#7722ff','#aa44ff','#7722ff','#aa44ff','#7722ff','#aa44ff','#4400aa',N,N,N,N,N,'#4400aa','#7722ff','#aa44ff','#7722ff','#aa44ff','#7722ff','#aa44ff','#4400aa',N,N,N,N,N,N,'#4400aa','#7722ff','#aa44ff','#7722ff','#4400aa',N,N,N,N,N,N,N,N,N,N,N,'#4400aa','#4400aa','#4400aa',N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N];
-A.angler=[N,N,N,N,'#003366',N,N,'#ffff44','#ffcc00',N,N,N,N,N,N,N,N,N,N,'#003366','#004488',N,N,'#ffcc00','#ffcc00',N,N,N,N,N,N,N,N,N,'#003366','#0066aa','#0066aa','#003366',N,N,N,N,N,N,N,N,N,N,N,'#003366','#0066aa','#0088cc','#0088cc','#0066aa','#003366',N,N,N,N,N,N,N,N,N,'#003366','#0066aa','#0088cc','#111','#0088cc','#0066aa','#0088cc','#003366',N,N,N,N,N,N,N,'#003366','#0066aa','#0088cc','#0088cc','#0088cc','#0066aa','#0088cc','#0066aa','#003366',N,N,N,N,N,N,N,'#003366','#0066aa','#ffffff','#0088cc','#0066aa','#0088cc','#0066aa',N,N,N,N,N,N,N,N,N,'#003366','#0066aa','#0088cc','#0066aa','#0088cc','#003366',N,N,N,N,N,N,N,N,N,'#003366','#0066aa','#0088cc','#0066aa','#0066aa','#0088cc','#0066aa','#003366',N,N,N,N,N,N,N,'#003366','#0088cc','#0088cc','#0088cc','#0088cc','#0088cc','#003366',N,N,N,N,N,N,N,N,N,'#003366','#0066aa','#0088cc','#0066aa','#003366',N,N,N,N,N,N,N,N,N,N,N,N,'#003366','#003366','#003366',N,N,N,N,N,N,N,N,N,N,N,N,'#003366','#0066aa',N,N,N,N,N,N,N,N,N,N,N,N,N,N,'#001a33','#001a33',N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N];
-A.kraken=[N,'#440088','#440088',N,N,'#440088','#440088',N,'#440088','#440088',N,N,'#440088','#440088',N,N,'#440088','#8800ff','#8800ff','#440088','#440088','#8800ff','#440088','#440088','#8800ff','#440088','#440088','#8800ff','#8800ff','#440088',N,N,'#440088','#8800ff','#aa44ff','#8800ff','#8800ff','#aa44ff','#8800ff','#8800ff','#aa44ff','#8800ff','#8800ff','#aa44ff','#8800ff','#440088',N,N,N,'#440088','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#440088',N,N,N,N,'#440088','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#440088',N,N,N,N,N,'#440088','#8800ff','#ffff44','#aa44ff','#8800ff','#8800ff','#aa44ff','#ffff44','#8800ff','#8800ff','#440088',N,N,N,N,N,'#440088','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#440088',N,N,N,N,'#440088','#8800ff','#8800ff','#ff4488','#8800ff','#8800ff','#ff4488','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#440088',N,N,'#440088','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#440088',N,N,'#440088','#8800ff','#aa44ff','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#aa44ff','#8800ff','#8800ff','#8800ff','#440088',N,N,N,N,'#440088','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#8800ff','#440088',N,N,N,N,N,N,N,'#440088','#8800ff','#440088','#440088','#440088','#440088','#440088','#440088',N,N,N,N,N,N,N,'#440088','#8800ff',N,N,N,N,N,N,N,'#8800ff','#440088',N,N,N,'#440088','#8800ff',N,N,N,N,N,N,N,N,N,'#8800ff','#440088',N,N,'#220044','#220044',N,N,N,N,N,N,N,N,N,'#220044','#220044',N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N];
-A.golem=[N,N,N,'#555','#555','#555','#555','#555','#555','#555','#555',N,N,N,N,N,N,N,'#555','#777','#777','#777','#777','#777','#777','#777','#777','#555',N,N,N,N,N,'#555','#777','#999','#777','#777','#777','#777','#777','#999','#777','#555',N,N,N,N,N,'#555','#777','#ffdd00','#777','#777','#777','#777','#ffdd00','#777','#777','#555',N,N,N,N,N,'#555','#777','#777','#777','#777','#777','#777','#777','#777','#777','#555',N,N,N,N,N,N,'#555','#777','#777','#777','#777','#777','#777','#777','#555',N,N,N,N,N,N,'#555','#777','#777','#777','#777','#777','#777','#777','#777','#777','#777','#555',N,N,N,'#555','#777','#999','#777','#777','#777','#777','#777','#777','#999','#777','#777','#555',N,N,N,'#555','#777','#777','#777','#777','#777','#777','#777','#777','#777','#777','#777','#555',N,N,N,'#555','#777','#777','#777','#777','#777','#777','#777','#777','#777','#777','#777','#555',N,N,N,N,'#555','#777','#777','#777','#777','#777','#777','#777','#777','#777','#555',N,N,N,N,N,N,'#555','#555','#555','#555',N,N,N,'#555','#555','#555',N,N,N,N,N,N,'#555','#777',N,N,N,N,N,N,'#777','#555',N,N,N,N,N,N,'#555','#777',N,N,N,N,N,N,'#777','#555',N,N,N,N,N,N,'#333','#333',N,N,N,N,N,N,'#333','#333',N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N];
-A.lava=[N,N,N,'#8b0000','#8b0000',N,N,N,'#8b0000','#8b0000',N,N,N,N,N,N,N,N,'#8b0000','#cc2200','#cc2200','#8b0000',N,'#8b0000','#cc2200','#cc2200','#8b0000',N,N,N,N,N,N,'#8b0000','#cc2200','#ff4400','#cc2200','#8b0000',N,'#8b0000','#ff4400','#cc2200','#8b0000',N,N,N,N,N,'#8b0000','#ff4400','#ff6600','#ff4400','#ff4400','#ff4400','#ff4400','#ff6600','#ff4400','#8b0000',N,N,N,N,N,N,'#8b0000','#ff4400','#111','#ff4400','#ff4400','#ff4400','#111','#ff4400','#ff4400','#8b0000',N,N,N,N,N,N,N,'#8b0000','#ff4400','#ff4400','#ff4400','#ff4400','#ff4400','#ff4400','#8b0000',N,N,N,N,N,N,N,N,'#8b0000','#ff4400','#ff6600','#ff4400','#ff6600','#ff4400','#8b0000',N,N,N,N,N,N,N,N,N,N,'#8b0000','#ff8800','#ff4400','#ff8800','#8b0000',N,N,N,N,N,N,N,N,N,N,'#8b0000','#ff4400','#ff4400','#ff4400','#ff4400','#ff4400','#8b0000',N,N,N,N,N,N,N,N,'#8b0000','#ff4400','#ff4400','#ff4400','#ff4400','#ff4400','#ff4400','#ff4400','#8b0000',N,N,N,N,N,N,'#8b0000','#ff4400','#ff4400','#ff4400','#ff4400','#ff4400','#ff4400','#ff4400','#8b0000',N,N,N,N,N,N,N,N,'#8b0000','#8b0000','#8b0000',N,N,'#8b0000','#8b0000','#8b0000',N,N,N,N,N,N,N,N,'#8b0000','#cc2200',N,N,N,'#cc2200','#8b0000',N,N,N,N,N,N,N,N,'#550000','#550000',N,N,N,'#550000','#550000',N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N];
-A.sphinx=[N,N,'#220033','#220033',N,N,N,N,N,N,'#220033','#220033',N,N,N,N,N,'#220033','#440066','#440066','#220033',N,N,N,N,'#220033','#440066','#440066','#220033',N,N,N,N,'#220033','#880099','#880099','#220033',N,N,N,N,'#220033','#880099','#880099','#220033',N,N,N,N,N,'#220033','#660099','#220033',N,N,N,N,N,'#660099','#220033',N,N,N,N,N,N,'#220033','#660099','#660099','#660099','#660099','#660099','#660099','#660099','#220033',N,N,N,N,N,N,'#220033','#660099','#ffdd00','#cc88ff','#660099','#660099','#cc88ff','#ffdd00','#660099','#660099','#220033',N,N,N,N,N,'#220033','#660099','#880099','#111','#660099','#660099','#111','#880099','#660099','#660099','#220033',N,N,N,N,'#220033','#660099','#880099','#660099','#660099','#660099','#660099','#660099','#880099','#660099','#660099','#660099','#220033',N,N,'#220033','#660099','#880099','#660099','#660099','#660099','#660099','#660099','#660099','#660099','#880099','#660099','#660099','#660099','#220033',N,'#220033','#660099','#660099','#660099','#660099','#660099','#660099','#660099','#660099','#660099','#660099','#660099','#660099','#660099','#220033',N,N,'#220033','#660099','#880099','#660099','#660099','#660099','#660099','#660099','#880099','#660099','#660099','#660099','#220033',N,N,N,N,'#220033','#660099','#660099','#660099','#660099','#660099','#660099','#660099','#660099','#660099','#220033',N,N,N,N,N,N,'#220033','#220033','#220033',N,N,N,'#220033','#220033','#220033',N,N,N,N,N,N,'#220033','#660099',N,N,N,N,N,N,N,'#660099','#220033',N,N,N,N,N,N,'#110022','#110022',N,N,N,N,N,N,N,'#110022','#110022',N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N];
-A.phoenix=[N,N,'#cc4400','#cc4400',N,'#ffaa00','#ffaa00',N,'#ffaa00',N,'#cc4400','#cc4400',N,N,N,N,N,'#cc4400','#ff6600','#ff6600','#cc4400','#ffcc00','#ffdd00','#ffcc00','#cc4400','#ff6600','#ff6600','#cc4400',N,N,N,N,N,'#cc4400','#ff8800','#ffaa00','#cc4400','#ffee44','#ffff66','#ffee44','#cc4400','#ffaa00','#ff8800','#cc4400',N,N,N,N,N,N,'#cc4400','#ff6600','#ff8800','#ff8800','#ff8800','#ff8800','#ff8800','#ff6600','#cc4400',N,N,N,N,N,N,N,'#cc4400','#ff8800','#ffcc00','#ff8800','#ffcc00','#ff8800','#ff6600','#cc4400',N,N,N,N,N,N,N,'#cc4400','#ff6600','#111','#ffcc00','#ff8800','#ffcc00','#111','#ff8800','#ff6600','#cc4400',N,N,N,N,N,'#cc4400','#ff6600','#ff8800','#ff8800','#ff8800','#ff8800','#ff8800','#ff8800','#ff6600','#cc4400',N,N,N,N,N,N,N,'#cc4400','#ff6600','#ff6699','#ff8800','#ff6699','#ff6600','#cc4400',N,N,N,N,N,N,N,'#cc4400','#ff6600','#ff8800','#ff8800','#ff8800','#ff8800','#ff8800','#ff8800','#ff6600','#cc4400',N,N,N,N,'#cc4400','#ff6600','#ff8800','#ffaa00','#ff8800','#ff8800','#ffaa00','#ff8800','#ff8800','#ff8800','#ff6600','#cc4400',N,N,'#cc4400','#ff6600','#ff8800','#ff8800','#ff8800','#ff8800','#ff8800','#ff8800','#ff8800','#ff8800','#ff8800','#ff8800','#ff6600','#cc4400',N,N,N,'#cc4400','#ff6600','#ff6600','#ff6600',N,N,N,'#ff6600','#ff6600','#ff6600','#cc4400',N,N,N,N,N,'#cc4400','#ff6600',N,N,N,N,N,'#ff6600','#cc4400',N,N,N,N,N,N,'#882200','#882200',N,N,N,N,N,'#882200','#882200',N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N];
-A.leviathan=[N,'#004477','#004477',N,N,N,N,N,N,N,'#004477','#004477',N,N,N,N,'#004477','#0077bb','#0077bb','#004477',N,N,N,N,N,'#004477','#0077bb','#0077bb','#004477',N,N,'#004477','#0099ee','#0099ee','#004477','#004477',N,N,N,'#004477','#004477','#0099ee','#0099ee','#004477',N,N,N,'#004477','#0099ee','#00bbff','#0099ee','#004477',N,'#004477','#0099ee','#00bbff','#0099ee','#004477',N,N,N,N,N,N,'#004477','#00bbff','#ffdd44','#0099ee','#004477','#0099ee','#ffdd44','#00bbff','#004477',N,N,N,N,N,N,'#004477','#0099ee','#00bbff','#0099ee','#0099ee','#0099ee','#00bbff','#0099ee','#004477',N,N,N,N,N,'#004477','#0099ee','#00ccff','#0099ee','#0099ee','#0099ee','#0099ee','#0099ee','#00ccff','#0099ee','#004477',N,N,N,'#004477','#0099ee','#00ccff','#111','#0099ee','#0099ee','#0099ee','#0099ee','#0099ee','#111','#00ccff','#0099ee','#004477',N,N,'#004477','#0099ee','#0099ee','#ff88cc','#0099ee','#0099ee','#ff88cc','#0099ee','#0099ee','#0099ee','#0099ee','#004477',N,N,'#004477','#0099ee','#00ccff','#0099ee','#0099ee','#0099ee','#0099ee','#0099ee','#0099ee','#00ccff','#0099ee','#004477',N,N,N,'#004477','#0099ee','#0099ee','#0099ee','#0099ee','#0099ee','#0099ee','#0099ee','#0099ee','#0099ee','#004477',N,N,N,N,N,'#004477','#004477','#004477','#004477',N,N,'#004477','#004477','#004477','#004477',N,N,N,N,N,'#004477','#0077bb',N,N,N,N,N,'#0077bb','#004477',N,N,N,'#004477','#0077bb',N,N,N,N,N,N,N,'#0077bb','#004477',N,N,'#002244','#002244',N,N,N,N,N,N,N,'#002244','#002244',N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N];
-A.champion=[N,N,N,N,N,'#fff','#fff','#fff','#fff','#fff',N,N,N,N,N,N,N,N,N,N,'#fff','#eee','#eee','#eee','#eee','#eee','#fff',N,N,N,N,N,N,N,N,'#fff','#eee','#ddd',N,N,N,'#ddd','#eee','#fff',N,N,N,N,N,N,'#fff','#eee',N,'#fff','#fff','#fff','#fff',N,'#eee','#fff',N,N,N,N,N,'#fff','#eee',N,'#fff','#eee','#eee','#eee','#eee','#fff',N,'#eee','#fff',N,N,N,N,'#fff','#eee',N,'#fff','#fff','#fff','#fff','#fff','#fff',N,'#eee','#fff',N,N,N,'#fff','#eee','#ddd',N,'#fff','#eee','#fff','#fff','#eee','#fff',N,'#ddd','#eee','#fff',N,N,'#fff','#eee','#eee',N,'#fff','#fff','#eee','#eee','#fff','#fff',N,'#eee','#eee','#fff',N,N,'#fff','#eee','#eee',N,'#fff','#fff','#fff','#fff','#fff','#fff',N,'#eee','#eee','#fff',N,N,'#fff','#eee','#ddd',N,'#fff','#eee','#eee','#eee','#eee','#fff','#ddd','#eee','#fff',N,N,N,N,'#fff','#eee','#ddd','#fff','#eee','#eee','#eee','#eee','#fff','#ddd','#eee','#fff',N,N,N,N,'#fff','#eee','#eee','#eee','#eee','#fff','#fff','#eee','#eee','#eee','#eee','#fff',N,N,N,N,N,'#fff','#eee','#eee','#fff','#eee','#eee','#fff','#eee','#eee','#fff',N,N,N,N,N,N,N,'#fff','#fff','#fff',N,N,N,'#fff','#fff','#fff',N,N,N,N,N,N,N,N,'#fff','#fff',N,N,N,'#fff','#fff',N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N];
-A.shadowking=[N,N,N,N,'#9900cc','#9900cc',N,'#440088','#440088',N,'#9900cc','#9900cc',N,N,N,N,N,N,N,'#220044','#9900cc','#cc44ff',N,N,N,N,'#cc44ff','#9900cc','#220044',N,N,N,N,N,'#220044','#9900cc','#cc44ff','#220044',N,N,'#220044','#cc44ff','#9900cc','#220044',N,N,N,N,'#220044','#9900cc','#cc44ff','#9900cc','#220044',N,'#220044','#9900cc','#cc44ff','#9900cc','#220044',N,N,N,N,N,N,'#220044','#6600aa','#440088','#440088','#440088','#440088','#440088','#440088','#220044',N,N,N,N,N,N,'#220044','#6600aa','#9900cc','#cc44ff','#6600aa','#6600aa','#cc44ff','#9900cc','#6600aa','#220044',N,N,N,N,N,'#220044','#6600aa','#9900cc','#111','#6600aa','#6600aa','#111','#9900cc','#6600aa','#220044',N,N,N,N,N,'#220044','#6600aa','#9900cc','#6600aa','#9900cc','#9900cc','#6600aa','#9900cc','#6600aa','#220044',N,N,N,N,N,N,'#220044','#6600aa','#ff44cc','#6600aa','#6600aa','#ff44cc','#6600aa','#220044',N,N,N,N,N,N,N,'#220044','#6600aa','#6600aa','#6600aa','#6600aa','#6600aa','#6600aa','#6600aa','#220044',N,N,N,N,N,'#220044','#6600aa','#9900cc','#6600aa','#6600aa','#6600aa','#6600aa','#6600aa','#9900cc','#6600aa','#220044',N,N,N,'#220044','#6600aa','#9900cc','#9900cc','#6600aa','#6600aa','#6600aa','#6600aa','#9900cc','#9900cc','#6600aa','#220044',N,N,N,N,'#220044','#220044','#220044','#220044',N,N,N,'#220044','#220044','#220044','#220044',N,N,N,N,N,'#220044','#6600aa',N,N,N,N,N,N,N,'#6600aa','#220044',N,N,N,N,N,N,'#110022','#110022',N,N,N,N,N,N,N,'#110022','#110022',N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N];
 
-// battlepass pet aliases
-A.battledog=A.dog;
-A.battletiger=A.tiger;
-A.warlion=A.wolf;
-A.battledragon=A.dragon;
-A.wickedwarrior=A.wolf;
+<div id="header">
+  <div id="header-inner">
+    <div id="top-row">
+      <div id="logo">
+        <div id="logo-icon">🎮</div>
+        <div>
+          <div id="title">ALEXREDEFINED</div>
+          <div id="subtitle">Live Chat Ranked System &nbsp;•&nbsp; +1 ELO per message</div>
+        </div>
+      </div>
+      <div id="status-row">
+        <div id="status-dot"></div>
+        <span id="status-text">OFFLINE</span>
+        <button id="connect-btn" onclick="toggleConnect()">CONNECT TO CHAT</button>
+      </div>
+    </div>
+    <div id="stats-row">
+      <div><span class="stat-val" id="stat-chatters">0</span><span class="stat-label">CHATTERS TRACKED</span></div>
+      <div><span class="stat-val" id="stat-msgs">0</span><span class="stat-label">TOTAL MESSAGES</span></div>
+      <div><span class="stat-val" id="stat-top">—</span><span class="stat-label">TOP CHATTER</span></div>
+    </div>
+    <div id="tabs">
+      <button class="tab active" onclick="switchTab('leaderboard', this)">LEADERBOARD</button>
+      <button class="tab" onclick="switchTab('livechat', this)">LIVE CHAT</button>
+      <button class="tab" onclick="switchTab('ranks', this)">RANKS</button>
+    </div>
+  </div>
+</div>
 
-function drawEgg(ctx,c1,c2,sc){
-  const e=[N,N,N,N,N,c1,c1,c1,c1,N,N,N,N,N,N,N,N,N,N,N,c1,c2,c2,c2,c2,c1,N,N,N,N,N,N,N,N,N,c1,c2,c2,c2,c2,c2,c2,c1,N,N,N,N,N,N,N,c1,c2,c2,c2,c2,c2,c2,c2,c2,c1,N,N,N,N,N,c1,c2,c2,c2,c2,c2,c2,c2,c2,c2,c2,c1,N,N,N,N,N,c1,c2,c2,c2,c2,c2,c2,c2,c2,c2,c2,c1,N,N,N,N,c1,c2,c2,c2,c2,c2,c2,c2,c2,c2,c2,c2,c2,c1,N,N,c1,c2,c2,c2,c2,c2,c2,c2,c2,c2,c2,c2,c2,c1,N,N,c1,c2,c2,c2,c2,c2,c2,c2,c2,c2,c2,c2,c2,c1,N,N,c1,c2,c2,c2,c2,c2,c2,c2,c2,c2,c2,c2,c2,c1,N,N,N,c1,c2,c2,c2,c2,c2,c2,c2,c2,c2,c2,c1,N,N,N,N,N,c1,c2,c2,c2,c2,c2,c2,c2,c2,c2,c2,c1,N,N,N,N,N,N,c1,c2,c2,c2,c2,c2,c2,c2,c2,c1,N,N,N,N,N,N,N,c1,c2,c2,c2,c2,c2,c2,c1,N,N,N,N,N,N,N,N,c1,c1,c1,c1,c1,c1,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N];
-  px(ctx,e,16,sc);
-}
+<div id="content">
+  <!-- Leaderboard -->
+  <div id="tab-leaderboard">
+    <div id="lb-empty">CONNECT TO START TRACKING</div>
+    <div id="lb-list"></div>
+  </div>
 
-const PACKS=[
-  {id:'basic',name:'Basic Pack',cost:100,ec1:'#8B4513',ec2:'#D2691E',odds:{common:70,rare:20,epic:7,legendary:2,mythic:1},pets:{common:{name:'Rabbit',ak:'rabbit',cps:1},rare:{name:'Tabby Cat',ak:'cat',cps:3},epic:{name:'Crystal Fox',ak:'fox',cps:8},legendary:{name:'Galaxy Wolf',ak:'wolf',cps:20},mythic:{name:'Cosmic Dragon',ak:'dragon',cps:60}}},
-  {id:'jungle',name:'Jungle Pack',cost:300,ec1:'#228B22',ec2:'#32CD32',odds:{common:70,rare:30,epic:15,legendary:4,mythic:1},pets:{common:{name:'Green Parrot',ak:'parrot',cps:4},rare:{name:'Jungle Tiger',ak:'tiger',cps:12},epic:{name:'Neon Chameleon',ak:'chameleon',cps:30},legendary:{name:'Golden Panther',ak:'panther',cps:80},mythic:{name:'Ancient Behemoth',ak:'behemoth',cps:250}}},
-  {id:'sea',name:'Sea Pack',cost:1000,ec1:'#00008B',ec2:'#4169E1',odds:{common:30,rare:35,epic:25,legendary:8,mythic:1},pets:{common:{name:'Blue Fish',ak:'fish',cps:15},rare:{name:'Seahorse',ak:'seahorse',cps:45},epic:{name:'Electric Eel',ak:'eel',cps:120},legendary:{name:'Anglerfish',ak:'angler',cps:300},mythic:{name:'Kraken',ak:'kraken',cps:900}}},
-  {id:'mythical',name:'Mythical Pack',cost:5000,ec1:'#800080',ec2:'#DA70D6',odds:{common:70,rare:20,epic:7,legendary:2,mythic:1},pets:{common:{name:'Stone Golem',ak:'golem',cps:60},rare:{name:'Lava Salamander',ak:'lava',cps:180},epic:{name:'Void Sphinx',ak:'sphinx',cps:500},legendary:{name:'Phoenix',ak:'phoenix',cps:1200},mythic:{name:'Celestial Leviathan',ak:'leviathan',cps:4000}}},
-  {id:'champion',name:'Champion Pack',cost:100000,ec1:'#ffffff',ec2:'#cccccc',isChampion:true,odds:{champion:0.01,fail:99.99},pets:{champion:{name:'Eternal Champion',ak:'champion',cps:100000}}},
+  <!-- Live Chat -->
+  <div id="tab-livechat" class="hidden">
+    <div id="chat-header">
+      <div id="chat-live-dot"></div>
+      <span id="chat-label">NOT CONNECTED</span>
+    </div>
+    <div id="chat-feed">
+      <div id="chat-empty">CONNECT TO SEE LIVE CHAT</div>
+    </div>
+  </div>
+
+  <!-- Ranks -->
+  <div id="tab-ranks" class="hidden">
+    <div id="ranks-list"></div>
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<script>
+const CHANNEL = 'alexredefined';
+const RANKS = [
+  { name:'Bronze',    min:0,     max:999,   color:'#CD7F32', icon:'🥉' },
+  { name:'Silver',    min:1000,  max:4999,  color:'#C0C0C0', icon:'🥈' },
+  { name:'Gold',      min:5000,  max:14999, color:'#FFD700', icon:'🥇' },
+  { name:'Diamond',   min:15000, max:29999, color:'#7DF9FF', icon:'💎' },
+  { name:'Alex',      min:30000, max:49999, color:'#FF4500', icon:'🔥' },
+  { name:'True Alex', min:50000, max:100000,color:'#FFFFFF', icon:'👑' },
 ];
 
-const RC={common:{l:'COMMON',c:'#aaaaaa'},rare:{l:'RARE',c:'#4488ff'},epic:{l:'EPIC',c:'#aa44ff'},legendary:{l:'LEGENDARY',c:'#ff8800'},mythic:{l:'MYTHIC',c:'#ff44aa'},champion:{l:'CHAMPION',c:'#ffffff'},shadowking:{l:'SHADOW KING',c:'#cc88ff'}};
-
-// ──────────────────────────────────────────────────────
-//  MUTATION SYSTEM
-// ──────────────────────────────────────────────────────
-const MUTATIONS={
-  none:{label:null,mult:1,cls:''},
-  crystal:{label:'CRYSTAL',mult:1.5,cls:'mut-crystal',color:'#44aaff',emoji:'💎'},
-  void:{label:'VOID',mult:2.5,cls:'mut-void',color:'#aa44ff',emoji:'🌑'},
-  celestial:{label:'CELESTIAL',mult:4,cls:'mut-celestial',color:'#ffdd44',emoji:'⭐'},
-  infinite:{label:'INFINITE',mult:6,cls:'mut-infinite',color:'#ff44ff',emoji:'♾️'},
-};
-const MUT_ODDS={none:85,crystal:10,void:4,celestial:0.9,infinite:0.1};
-const EVENT_INTERVAL=30*60*1000; // 30 min
-const EVENT_DURATION=60*1000;    // 1 min
-const WARN_BEFORE=60*1000;       // warn 1 min before
-
-let mutEventActive=false;
-let mutEventStart=Date.now()+EVENT_INTERVAL; // first event in 30 min
-let mutEventEnd=0; // when the active event ends
-
-function rollMutation(){
-  if(!mutEventActive)return'none';
-  let r=Math.random()*100;
-  for(const k of['infinite','celestial','void','crystal','none']){r-=MUT_ODDS[k];if(r&lt;=0)return k;}
-  return'none';
+function getRank(elo) {
+  for (let i = RANKS.length - 1; i >= 0; i--) if (elo >= RANKS[i].min) return RANKS[i];
+  return RANKS[0];
+}
+function getProgress(elo) {
+  const r = getRank(elo);
+  return Math.min(100, ((elo - r.min) / (r.max - r.min)) * 100);
 }
 
-function calcEffectiveCps(entry){
-  const base=entry.count*(entry.pet.cps||0);
-  const mult=MUTATIONS[entry.mutation||'none'].mult;
-  return base*mult;
+// State
+let leaderboard = JSON.parse(localStorage.getItem('alex-lb') || '{}');
+let totalMsgs = parseInt(localStorage.getItem('alex-msgs') || '0');
+let ws = null, pingInterval = null;
+let currentTab = 'leaderboard';
+
+// Save
+function save() {
+  localStorage.setItem('alex-lb', JSON.stringify(leaderboard));
+  localStorage.setItem('alex-msgs', totalMsgs);
 }
-function calcEffectiveClick(entry){
-  const base=Math.max(1,entry.pet.cps||0);
-  const mult=MUTATIONS[entry.mutation||'none'].mult;
-  return Math.max(1,Math.round(base*mult));
-}
 
-function updateMutTimer(){
-  const now=Date.now();
-  const pill=document.getElementById('mutPill');
-  if(!pill)return;
-
-  if(mutEventActive){
-    const remaining=Math.max(0,mutEventEnd-now);
-    if(remaining&lt;=0){
-      mutEventActive=false;
-      pill.className='mut-event-pill waiting';
-    } else {
-      const s=Math.ceil(remaining/1000);
-      pill.className='mut-event-pill active';
-      pill.innerHTML=`✦ MUTATION EVENT ACTIVE! ✦ &lt;span id="mutTimer"&gt;${s}s left&lt;/span&gt;`;
-      return;
-    }
-  }
-
-  const until=mutEventStart-now;
-  if(until&lt;=0){
-    // Start event — advance start time immediately so we don't re-trigger
-    mutEventActive=true;
-    mutEventEnd=now+EVENT_DURATION;
-    mutEventStart=now+EVENT_INTERVAL; // next event 30min from now
-    pill.className='mut-event-pill active';
-    pill.innerHTML=`✦ MUTATION EVENT ACTIVE! ✦ &lt;span id="mutTimer"&gt;60s left&lt;/span&gt;`;
-    addBattleXp(20); // participation bonus
-    // Flash screen
-    const flash=document.createElement('div');
-    flash.style.cssText='position:fixed;inset:0;background:#ff44ff22;z-index:700;pointer-events:none;';
-    document.body.appendChild(flash);setTimeout(()=&gt;flash.remove(),700);
-    return;
-  }
-
-  const warnZone=until&lt;=WARN_BEFORE;
-  const mins=Math.floor(until/60000);
-  const secs=Math.floor((until%60000)/1000);
-  const timeStr=mins&gt;0?`${mins}:${String(secs).padStart(2,'0')}`:`${secs}s`;
-  if(warnZone){
-    pill.className='mut-event-pill warning';
-    pill.innerHTML=`⚡ MUTATION EVENT SOON — &lt;span id="mutTimer"&gt;${timeStr}&lt;/span&gt;`;
+// Status UI
+function setStatus(state) {
+  const dot = document.getElementById('status-dot');
+  const text = document.getElementById('status-text');
+  const btn = document.getElementById('connect-btn');
+  dot.className = state;
+  if (state === 'connected') {
+    text.style.color = '#00ff87'; text.textContent = 'LIVE — #' + CHANNEL;
+    btn.className = 'disconnect'; btn.textContent = 'DISCONNECT';
+    document.getElementById('chat-live-dot').className = 'live';
+    document.getElementById('chat-label').textContent = 'LIVE FEED — #' + CHANNEL;
+  } else if (state === 'connecting') {
+    text.style.color = '#FFD700'; text.textContent = 'CONNECTING...';
+    btn.className = ''; btn.textContent = 'CONNECTING...'; btn.disabled = true;
+  } else if (state === 'error') {
+    text.style.color = '#ff4444'; text.textContent = 'CONNECTION ERROR';
+    btn.className = ''; btn.textContent = 'RETRY'; btn.disabled = false;
+    document.getElementById('chat-live-dot').className = '';
+    document.getElementById('chat-label').textContent = 'NOT CONNECTED';
   } else {
-    pill.className='mut-event-pill waiting';
-    pill.innerHTML=`⬡ MUTATION EVENT — next in &lt;span id="mutTimer"&gt;${timeStr}&lt;/span&gt;`;
+    text.style.color = '#555'; text.textContent = 'OFFLINE';
+    btn.className = ''; btn.textContent = 'CONNECT TO CHAT'; btn.disabled = false;
+    document.getElementById('chat-live-dot').className = '';
+    document.getElementById('chat-label').textContent = 'NOT CONNECTED';
   }
 }
 
-setInterval(updateMutTimer,500);
-updateMutTimer();
-
-// ──────────────────────────────────────────────────────
-//  STATE
-// ──────────────────────────────────────────────────────
-let coins=0,totalCoins=0,totalHatches=0;
-let username=null;
-let showUsernames=false;
-let leaderboard=[]; // {username,cps}
-let battleXp=0,battleLevel=1,battlepassEggs=0,battleResets=0;
-const col={};
-const anims={};
-col['starter_dog']={count:1,pet:{name:'Dog',ak:'dog',cps:0},rarity:'common',mutation:'none',autoOn:false,autoInterval:null};
-
-// ──────────────────────────────────────────────────────
-//  QUESTLINE SYSTEM
-// ──────────────────────────────────────────────────────
-const QUEST_EGGS_NEEDED=2500;
-const QUEST_MUTS_NEEDED=10;
-let questUnlocked=false; // true once Shadow King awarded
-
-function countMutatedPets(){
-  let n=0;
-  for(const k in col){if(col[k].mutation&amp;&amp;col[k].mutation!=='none')n+=col[k].count;}
-  return n;
-}
-function questEggsDone(){return totalHatches&gt;=QUEST_EGGS_NEEDED;}
-function questMutsDone(){return countMutatedPets()&gt;=QUEST_MUTS_NEEDED;}
-function allQuestsDone(){return questEggsDone()&amp;&amp;questMutsDone();}
-
-function checkQuestline(){
-  if(questUnlocked)return;
-  if(!allQuestsDone())return;
-  questUnlocked=true;
-  // Award the Shadow King
-  const sk={name:'Shadow King',ak:'shadowking',cps:50000};
-  const key='questline_shadowking';
-  if(!col[key])col[key]={count:0,pet:sk,rarity:'shadowking',mutation:'none',autoOn:false,autoInterval:null};
-  col[key].count++;
-  renderCol();
-  showShadowKingUnlock();
+function toggleConnect() {
+  if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
+    disconnect();
+  } else {
+    connect();
+  }
 }
 
-function showShadowKingUnlock(){
-  const ov=document.getElementById('hatchOverlay');
-  ov.style.display='flex';ov.innerHTML='';
-  const box=document.createElement('div');
-  box.className='hatch-box';
-  box.style.cssText='border-color:#6600cc;box-shadow:0 0 40px #6600ccaa;animation:popIn .3s cubic-bezier(.34,1.56,.64,1),shadowGlow 2s ease-in-out infinite;max-width:340px;';
-  // Header
-  const hd=document.createElement('div');
-  hd.style.cssText='font-family:Press Start 2P,monospace;font-size:8px;color:#cc88ff;margin-bottom:6px;letter-spacing:1px;';
-  hd.textContent='✦ QUESTLINE COMPLETE ✦';
-  // Rarity banner
-  const rd=document.createElement('div');
-  rd.style.cssText='font-family:Press Start 2P,monospace;font-size:14px;color:#cc88ff;margin-bottom:8px;text-shadow:0 0 16px #6600cc;animation:rarPop .5s ease-out;';
-  rd.textContent='👑 SHADOW KING 👑';
-  // Canvas
-  const pc=document.createElement('canvas');pc.width=128;pc.height=128;pc.style.imageRendering='pixelated';pc.style.display='block';pc.style.margin='10px auto';
-  const ctx=pc.getContext('2d');ctx.imageSmoothingEnabled=false;
-  px(ctx,A.shadowking,16,8);
-  // Animate bob + shadow pulse
-  let bob=0;
-  const skAnim=()=&gt;{
-    if(!document.contains(pc))return;
-    bob+=0.05;ctx.clearRect(0,0,128,128);
-    ctx.save();ctx.translate(0,Math.round(Math.sin(bob)*3));
-    px(ctx,A.shadowking,16,8);ctx.restore();
-    requestAnimationFrame(skAnim);
+function connect() {
+  setStatus('connecting');
+  ws = new WebSocket('wss://irc-ws.chat.twitch.tv:443');
+
+  ws.onopen = () => {
+    ws.send('CAP REQ :twitch.tv/tags twitch.tv/commands');
+    ws.send('PASS SCHMOOPIIE');
+    ws.send('NICK justinfan' + Math.floor(Math.random() * 99999));
+    ws.send('JOIN #' + CHANNEL);
+    pingInterval = setInterval(() => { if (ws.readyState === WebSocket.OPEN) ws.send('PING :tmi.twitch.tv'); }, 60000);
   };
-  setTimeout(skAnim,50);
-  // Description
-  const desc=document.createElement('div');
-  desc.style.cssText='font-size:15px;color:#9966cc;margin-bottom:6px;line-height:1.5;';
-  desc.textContent='The Shadow King rises from the void. A pet only true masters can claim.';
-  const cps=document.createElement('div');
-  cps.style.cssText='font-family:Press Start 2P,monospace;font-size:8px;color:#cc88ff;margin-bottom:14px;';
-  cps.textContent='50,000 CPS';
-  const btn=document.createElement('button');btn.className='hclose';
-  btn.style.cssText='border-color:#6600cc;color:#cc88ff;';
-  btn.textContent='▶ CLAIM REWARD';
-  btn.onclick=()=&gt;{ov.style.display='none';};
-  box.appendChild(hd);box.appendChild(rd);box.appendChild(pc);box.appendChild(desc);box.appendChild(cps);box.appendChild(btn);
-  ov.appendChild(box);
-  ov.onclick=e=&gt;{if(e.target===ov)ov.style.display='none';};
-  // Dark particle burst
-  for(let i=0;i&lt;35;i++){
-    const el=document.createElement('div');
-    const colors=['#6600cc','#9900ff','#cc44ff','#440088','#aa00ff'];
-    const c=colors[Math.floor(Math.random()*colors.length)];
-    const sz=(4+Math.random()*8)+'px';
-    el.style.cssText=`position:fixed;width:${sz};height:${sz};background:${c};left:${20+Math.random()*60}%;top:${20+Math.random()*60}%;z-index:700;pointer-events:none;border-radius:1px;animation:floatUp ${.5+Math.random()*1.4}s ease-out forwards;box-shadow:0 0 8px ${c};`;
-    document.body.appendChild(el);setTimeout(()=&gt;el.remove(),2000);
-  }
-}
 
-function spawnFloat(x,y,txt,c){
-  const el=document.createElement('div');
-  el.className='float-text';el.textContent=txt;
-  if(c)el.style.color=c;
-  el.style.left=(x-20)+'px';el.style.top=(y-16)+'px';
-  document.body.appendChild(el);
-  setTimeout(()=&gt;el.remove(),900);
-  addBattleXp(1);
-}
-function rollRarity(o){
-  let r=Math.random()*100;
-  for(const k of['mythic','legendary','epic','rare','common']){r-=o[k];if(r&lt;=0)return k;}
-  return'common';
-}
-function calcCps(){
-  let s=0;
-  for(const k in col){const c=col[k];if(c.autoOn)s+=calcEffectiveCps(c);}
-  return Math.round(s);
-}
-function updateTop(){
-  document.getElementById('coinDisplay').textContent=Math.floor(coins).toLocaleString();
-  const c=calcCps();
-  document.getElementById('cpsDisplay').textContent=c&gt;0?`⚡${c.toLocaleString()} CPS`:'0 CPS';
-  PACKS.forEach(p=&gt;{const el=document.getElementById('pk_'+p.id);if(el)el.classList.toggle('cant-afford',coins&lt;p.cost);});
-  updateLeaderboard(c);
-  renderBattlepass();
-}
+  ws.onmessage = (e) => {
+    const lines = e.data.trim().split('\r\n');
+    lines.forEach(line => {
+      if (line.startsWith('PING')) { ws.send('PONG :tmi.twitch.tv'); return; }
+      if (line.includes(':tmi.twitch.tv 001')) setStatus('connected');
+      if (!line.includes('PRIVMSG')) return;
 
-function buildShop(){
-  const s=document.getElementById('eggShop');s.innerHTML='';
-  PACKS.forEach(p=&gt;{
-    const card=document.createElement('div');
-    card.className='egg-card'+(coins&lt;p.cost?' cant-afford':'')+(p.isChampion?' champion-card':'');
-    card.id='pk_'+p.id;
-    const ec=document.createElement('canvas');ec.width=48;ec.height=48;
-    const ctx=ec.getContext('2d');ctx.imageSmoothingEnabled=false;
-    if(p.isChampion){
-      let champEggHue=0;
-      const drawChampEgg=()=&gt;{
-        ctx.clearRect(0,0,48,48);
-        const shapes=[[5,0,4],[4,1,6],[3,2,8],[2,3,10],[1,4,12],[1,5,12],[0,6,14],[0,7,14],[0,8,14],[0,9,14],[1,10,12],[1,11,12],[2,12,10],[3,13,8],[4,14,6]];
-        shapes.forEach(([x,y,w],i)=&gt;{
-          const hue=(champEggHue+i*20)%360;
-          ctx.fillStyle=`hsl(${hue},100%,65%)`;
-          ctx.fillRect(x*3,y*3,w*3,3);
+      // Parse tags
+      let displayName = null, color = null;
+      const tagMatch = line.match(/^@([^ ]+)/);
+      if (tagMatch) {
+        tagMatch[1].split(';').forEach(t => {
+          const [k,v] = t.split('=');
+          if (k === 'display-name' && v) displayName = v;
+          if (k === 'color' && v) color = v;
         });
-        champEggHue=(champEggHue+2)%360;
-      };
-      drawChampEgg();
-      const animEgg=()=&gt;{
-        if(!document.contains(ec))return;
-        drawChampEgg();
-        requestAnimationFrame(animEgg);
-      };
-      setTimeout(animEgg,0);
-    } else {drawEgg(ctx,p.ec1,p.ec2,3);}
-    const info=document.createElement('div');info.className='egg-info';
-    if(p.isChampion){
-      info.innerHTML=`&lt;div class="ename champ-label"&gt;${p.name}&lt;/div&gt;&lt;div class="ecost"&gt;💰${p.cost.toLocaleString()}&lt;/div&gt;&lt;div class="eodds"&gt;&lt;span style="animation:rainbowText 2s linear infinite;display:inline-block"&gt;✦ CHAMPION: 0.01%&lt;/span&gt;&lt;br&gt;&lt;span style="color:#555;font-size:11px"&gt;Nothing else: 99.99%&lt;/span&gt;&lt;/div&gt;`;
-    } else {
-      info.innerHTML=`&lt;div class="ename"&gt;${p.name}&lt;/div&gt;&lt;div class="ecost"&gt;💰${p.cost.toLocaleString()}&lt;/div&gt;&lt;div class="eodds"&gt;&lt;span style="color:#aaa"&gt;C:${p.odds.common}%&lt;/span&gt;&lt;span style="color:#4488ff"&gt; R:${p.odds.rare}%&lt;/span&gt;&lt;span style="color:#aa44ff"&gt; E:${p.odds.epic}%&lt;/span&gt;&lt;span style="color:#ff8800"&gt; L:${p.odds.legendary}%&lt;/span&gt;&lt;span style="color:#ff44aa"&gt; M:${p.odds.mythic}%&lt;/span&gt;&lt;/div&gt;`;
-    }
-    card.appendChild(ec);card.appendChild(info);
-    card.onclick=()=&gt;openPack(p);
-    s.appendChild(card);
-  });
-}
+      }
+      const nickMatch = line.match(/:([^!]+)!/);
+      const msgMatch = line.match(/PRIVMSG #\w+ :(.+)/);
+      if (!nickMatch || !msgMatch) return;
 
-function openPack(p){
-  if(coins&lt;p.cost)return;
-  coins-=p.cost;totalHatches++;
-  updateTop();
-  addBattleXp(5); // xp for opening packs
-  if(p.isChampion){
-    const roll=Math.random()*100;
-    if(roll&lt;=0.01){
-      const pet=p.pets.champion;
-      const key='champion_champion';
-      if(!col[key])col[key]={count:0,pet,rarity:'champion',mutation:'none',autoOn:false,autoInterval:null};
-      col[key].count++;
-      renderCol();
-      showHatch(p,pet,'champion','none');
-      switchTab('collection');
-      saveGame();
-    } else {showChampionFail(p);}
-    return;
-  }
-  const rar=rollRarity(p.odds);
-  const pet=p.pets[rar];
-  if(mut!=='none') addBattleXp(10); // mutated pet bonus
-  const mut=rollMutation();
-  // Each unique pet+mutation combo gets its own slot
-  const key=p.id+'_'+rar+(mut!=='none'?'_'+mut:'');
-  if(!col[key])col[key]={count:0,pet,rarity:rar,mutation:mut,autoOn:false,autoInterval:null};
-  col[key].count++;
-  renderCol();
-  showHatch(p,pet,rar,mut);
-  switchTab('collection');
-  checkQuestline();
-  saveGame();
-}
+      const key = nickMatch[1].toLowerCase();
+      const username = displayName || nickMatch[1];
+      const msg = msgMatch[1];
 
-function showChampionFail(p){
-  const ov=document.getElementById('hatchOverlay');
-  ov.style.display='flex';ov.innerHTML='';
-  const box=document.createElement('div');box.className='hatch-box';
-  const rd=document.createElement('div');rd.style.cssText='font-family:Press Start 2P,monospace;font-size:11px;color:#555;margin-bottom:10px;';rd.textContent='NOTHING...';
-  const ec=document.createElement('canvas');ec.width=128;ec.height=128;
-  const ctx=ec.getContext('2d');ctx.imageSmoothingEnabled=false;
-  drawChampionEgg(ctx,8);
-  setTimeout(()=&gt;{ctx.clearRect(0,0,128,128);ctx.fillStyle='#333';ctx.font='14px monospace';ctx.textAlign='center';ctx.fillText('💨 empty...',64,72);},400);
-  const sub=document.createElement('div');sub.style.cssText='font-size:14px;color:#555;margin-bottom:12px;';sub.textContent='Better luck next time... (0.01%)';
-  const btn=document.createElement('button');btn.className='hclose';btn.style.borderColor='#444';btn.style.color='#555';btn.textContent='▶ TRY AGAIN';
-  btn.onclick=()=&gt;ov.style.display='none';
-  box.appendChild(rd);box.appendChild(ec);box.appendChild(sub);box.appendChild(btn);
-  ov.appendChild(box);
-  ov.onclick=e=&gt;{if(e.target===ov)ov.style.display='none';};
-}
+      if (!leaderboard[key]) leaderboard[key] = { username, elo: 0, color };
+      leaderboard[key].elo++;
+      leaderboard[key].username = username;
+      if (!leaderboard[key].color && color) leaderboard[key].color = color;
+      totalMsgs++;
 
-function showHatch(p,pet,rar,mut){
-  mut=mut||'none';
-  const ov=document.getElementById('hatchOverlay');
-  ov.style.display='flex';ov.innerHTML='';
-  const box=document.createElement('div');
-  box.className='hatch-box'+(rar==='champion'?' champion':'');
-  const ri=RC[rar];
-  const rd=document.createElement('div');
-  rd.className='hrarity'+(rar==='champion'?' champion':'');
-  rd.style.color=ri.c;
-  rd.textContent=rar==='champion'?'🏆 CHAMPION 🏆':'✨ '+ri.l+' ✨';
-  const pc=document.createElement('canvas');pc.width=128;pc.height=128;
-  const ctx=pc.getContext('2d');ctx.imageSmoothingEnabled=false;
-  if(rar==='champion')drawChampionEgg(ctx,8);
-  else drawEgg(ctx,p.ec1,p.ec2,8);
-  const nd=document.createElement('div');nd.className='hname';
-  if(rar==='champion'){nd.style.animation='rainbowText 1s linear infinite';nd.style.fontFamily='Press Start 2P,monospace';}
-  nd.textContent=pet.name;
-  const btn=document.createElement('button');btn.className='hclose';btn.textContent='▶ COLLECT';
-  btn.onclick=()=&gt;ov.style.display='none';
-  box.appendChild(rd);box.appendChild(pc);box.appendChild(nd);
-  // Mutation display
-  const mutInfo=MUTATIONS[mut];
-  if(mut!=='none'){
-    const mutEl=document.createElement('div');
-    mutEl.style.cssText=`font-family:'Press Start 2P',monospace;font-size:9px;color:${mutInfo.color};margin-bottom:6px;text-shadow:0 0 8px ${mutInfo.color};animation:rarPop .4s ease-out;`;
-    mutEl.textContent=`${mutInfo.emoji} ${mutInfo.label} MUTATION ${mutInfo.emoji}`;
-    box.appendChild(mutEl);
-    const multEl=document.createElement('div');
-    multEl.style.cssText=`font-size:14px;color:${mutInfo.color};margin-bottom:10px;opacity:.85;`;
-    multEl.textContent=`×${mutInfo.mult} coins per click!`;
-    box.appendChild(multEl);
-  }
-  box.appendChild(btn);
-  ov.appendChild(box);
-  ov.onclick=e=&gt;{if(e.target===ov)ov.style.display='none';};
-  setTimeout(()=&gt;{
-    ctx.clearRect(0,0,128,128);
-    if(rar==='champion')drawChampionPet(ctx,8);
-    else px(ctx,A[pet.ak],16,8);
-    if(rar==='champion'){for(let w=0;w&lt;5;w++)setTimeout(()=&gt;boomRainbow(),w*200);}
-    else if(mut!=='none')boomMutation(mutInfo.color);
-    else boom(ri.c);
-  },480);
-  if(rar==='champion'){
-    let hue=0;
-    const champAnim=()=&gt;{
-      if(!document.contains(pc))return;
-      ctx.clearRect(0,0,128,128);
-      drawChampionPet(ctx,8,hue);
-      hue=(hue+2)%360;
-      requestAnimationFrame(champAnim);
-    };
-    setTimeout(champAnim,490);
-  }
-}
+      const rank = getRank(leaderboard[key].elo);
 
-function boom(c){
-  for(let i=0;i&lt;20;i++){
-    const el=document.createElement('div');
-    el.style.cssText=`position:fixed;width:5px;height:5px;background:${c};left:${35+Math.random()*30}%;top:${35+Math.random()*30}%;z-index:700;pointer-events:none;border-radius:1px;animation:floatUp ${.5+Math.random()*.8}s ease-out forwards;`;
-    document.body.appendChild(el);setTimeout(()=&gt;el.remove(),1300);
-  }
-}
+      // Debounced save
+      clearTimeout(window._saveTimer);
+      window._saveTimer = setTimeout(save, 1500);
 
-function boomRainbow(){
-  const colors=['#ff4444','#ff8800','#ffff00','#44ff88','#44aaff','#aa44ff','#ff44aa','#ffffff'];
-  for(let i=0;i&lt;40;i++){
-    const el=document.createElement('div');
-    const c=colors[Math.floor(Math.random()*colors.length)];
-    const size=(3+Math.random()*6)+'px';
-    el.style.cssText=`position:fixed;width:${size};height:${size};background:${c};left:${20+Math.random()*60}%;top:${20+Math.random()*60}%;z-index:700;pointer-events:none;border-radius:1px;animation:floatUp ${.4+Math.random()*1.2}s ease-out forwards;box-shadow:0 0 4px ${c};`;
-    document.body.appendChild(el);setTimeout(()=&gt;el.remove(),1600);
-  }
-}
-
-function boomMutation(color){
-  for(let i=0;i&lt;30;i++){
-    const el=document.createElement('div');
-    const size=(3+Math.random()*7)+'px';
-    el.style.cssText=`position:fixed;width:${size};height:${size};background:${color};left:${25+Math.random()*50}%;top:${25+Math.random()*50}%;z-index:700;pointer-events:none;border-radius:1px;animation:floatUp ${.4+Math.random()*1.2}s ease-out forwards;box-shadow:0 0 6px ${color};`;
-    document.body.appendChild(el);setTimeout(()=&gt;el.remove(),1600);
-  }
-}
-
-function drawChampionEgg(ctx,sc){
-  const shapes=[[5,0,4],[4,1,6],[3,2,8],[2,3,10],[1,4,12],[1,5,12],[0,6,14],[0,7,14],[0,8,14],[0,9,14],[1,10,12],[1,11,12],[2,12,10],[3,13,8],[4,14,6]];
-  shapes.forEach(([x,y,w],i)=&gt;{
-    const hue=(i/shapes.length*360+Date.now()/20)%360;
-    ctx.fillStyle=`hsl(${hue},100%,65%)`;
-    ctx.fillRect(x*sc,y*sc,w*sc,sc);
-  });
-}
-
-function drawChampionPet(ctx,sc,hueOff=0){
-  const shape=[0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,2,2,2,2,2,1,0,0,0,0,0,0,0,0,1,2,2,3,3,3,2,2,1,0,0,0,0,0,0,1,2,3,1,1,1,1,3,2,2,1,0,0,0,0,1,2,3,1,2,2,2,2,1,3,2,2,1,0,0,0,1,2,3,1,1,1,1,1,1,3,2,2,1,0,0,1,2,3,3,1,2,1,1,2,1,3,3,2,2,1,0,1,2,2,3,1,1,2,2,1,1,3,2,2,2,1,0,1,2,2,3,1,1,1,1,1,1,3,2,2,2,1,0,1,2,3,3,1,2,2,2,2,1,3,3,2,2,1,0,0,1,2,3,3,1,2,2,1,3,3,2,2,1,0,0,0,1,2,2,2,2,1,1,2,2,2,2,2,1,0,0,0,0,1,2,2,1,2,2,1,2,2,1,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-  for(let i=0;i&lt;shape.length;i++){
-    const v=shape[i];if(!v)continue;
-    const x=(i%16)*sc,y=Math.floor(i/16)*sc;
-    const hue=(hueOff+i*6)%360;
-    if(v===1)ctx.fillStyle=`hsl(${hue},100%,55%)`;
-    else if(v===2)ctx.fillStyle=`hsl(${(hue+30)%360},100%,70%)`;
-    else ctx.fillStyle=`hsl(${(hue+60)%360},100%,85%)`;
-    ctx.fillRect(x,y,sc,sc);
-  }
-}
-
-function renderCol(){
-  for(const k in anims){cancelAnimationFrame(anims[k].rid);delete anims[k];}
-  const grid=document.getElementById('petGrid');
-  grid.innerHTML='';
-  const ord=['shadowking','champion','mythic','legendary','epic','rare','common'];
-  const sorted=Object.entries(col).sort(([,a],[,b])=&gt;ord.indexOf(a.rarity)-ord.indexOf(b.rarity));
-  sorted.forEach(([key,c])=&gt;{
-    const mut=c.mutation||'none';
-    const mutInfo=MUTATIONS[mut];
-    const slot=document.createElement('div');
-    slot.className='pet-slot '+c.rarity+(mut!=='none'?' '+mutInfo.cls:'');
-    const cv=document.createElement('canvas');cv.width=64;cv.height=64;cv.style.imageRendering='pixelated';
-    const earn=calcEffectiveClick(c);
-    const rarColor=c.rarity==='champion'?'#ffffff':(RC[c.rarity]?.c||'#fff');
-    cv.addEventListener('click',()=&gt;{
-      coins+=earn;totalCoins+=earn;updateTop();
-      const r=cv.getBoundingClientRect();
-      spawnFloat(r.left+32,r.top-4,'+'+earn.toLocaleString(),mut!=='none'?mutInfo.color:rarColor);
-      debouncedSave();
+      updateStats();
+      if (currentTab === 'leaderboard') renderLeaderboard();
+      if (currentTab === 'livechat') appendChat(username, msg, leaderboard[key].elo, rank, color);
+      if (currentTab === 'ranks') renderRanks();
+      showToast(username, rank, leaderboard[key].elo);
     });
-    const nm=document.createElement('div');nm.className='pname';nm.textContent=c.pet.name;
-    const cnt=document.createElement('div');cnt.className='pcount';cnt.id='cnt_'+key;cnt.textContent='×'+c.count;
-    // Mutation badge
-    let mutBadge='';
-    if(mut!=='none') mutBadge=`&lt;div class="mut-badge ${mut}"&gt;${mutInfo.emoji} ${mutInfo.label}&lt;/div&gt;`;
-    const cp=document.createElement('div');cp.className='pcps';cp.id='cp_'+key;
-    cp.textContent=c.autoOn?`⚡${Math.round(calcEffectiveCps(c)).toLocaleString()}/s`:'+'+earn.toLocaleString()+'/click';
-    const ab=document.createElement('button');ab.className='abtn'+(c.autoOn?' on':'');
-    ab.textContent=c.autoOn?'AUTO ON':'AUTO OFF';
-    ab.addEventListener('click',()=&gt;toggleAuto(key,ab,cp,c));
-    slot.appendChild(cv);slot.appendChild(nm);
-    if(mutBadge){const mb=document.createElement('div');mb.innerHTML=mutBadge;slot.appendChild(mb.firstChild);}
-    slot.appendChild(cnt);slot.appendChild(cp);slot.appendChild(ab);
-    grid.appendChild(slot);
-    anims[key]={b:Math.random()*Math.PI*2,hue:0,rid:0};
-    const anim=anims[key];
-    if(c.rarity==='champion'){
-      const champLoop=()=&gt;{
-        const ctx2=cv.getContext('2d');ctx2.clearRect(0,0,64,64);ctx2.imageSmoothingEnabled=false;
-        anim.b+=0.04;
-        const yo=Math.round(Math.sin(anim.b)*2);
-        ctx2.save();ctx2.translate(0,yo);drawChampionPet(ctx2,4,anim.hue);ctx2.restore();
-        anim.hue=(anim.hue+1.5)%360;anim.rid=requestAnimationFrame(champLoop);
-      };
-      champLoop();
-    } else if(c.rarity==='shadowking'){
-      const skLoop=()=&gt;{
-        const ctx2=cv.getContext('2d');ctx2.clearRect(0,0,64,64);ctx2.imageSmoothingEnabled=false;
-        anim.b+=0.04;const yo=Math.round(Math.sin(anim.b)*2);
-        ctx2.save();ctx2.translate(0,yo);px(ctx2,A.shadowking,16,4);ctx2.restore();
-        anim.rid=requestAnimationFrame(skLoop);
-      };
-      skLoop();
-    } else {
-      const loop=()=&gt;{
-        const ctx2=cv.getContext('2d');ctx2.clearRect(0,0,64,64);ctx2.imageSmoothingEnabled=false;
-        anim.b+=0.05;const yo=Math.round(Math.sin(anim.b)*2);
-        px(ctx2,A[c.pet.ak],16,4,0,yo);anim.rid=requestAnimationFrame(loop);
-      };
-      loop();
-    }
-  });
-}
-
-function toggleAuto(key,btn,cp,c){
-  if(c.autoOn){
-    c.autoOn=false;clearInterval(c.autoInterval);c.autoInterval=null;
-    btn.className='abtn';btn.textContent='AUTO OFF';
-    cp.textContent='+'+calcEffectiveClick(c)+'/click';
-  } else {
-    c.autoOn=true;
-    c.autoInterval=setInterval(()=&gt;{
-      const g=calcEffectiveCps(c);coins+=g;totalCoins+=g;updateTop();
-      debouncedSave();
-    },1000);
-    btn.className='abtn on';btn.textContent='AUTO ON';
-    cp.textContent=`⚡${Math.round(calcEffectiveCps(c)).toLocaleString()}/s`;
-  }
-  updateTop();
-  saveGame();
-}
-
-setInterval(updateTop,1000);
-
-function switchTab(tab){
-  document.getElementById('tabCollection').classList.toggle('active',tab==='collection');
-  document.getElementById('tabIndex').classList.toggle('active',tab==='index');
-  document.getElementById('tabQuests').classList.toggle('active',tab==='quests');
-  document.getElementById('tabLeaderboard').classList.toggle('active',tab==='leaderboard');
-  document.getElementById('tabBattlepass').classList.toggle('active',tab==='battlepass');
-  document.getElementById('tabBtnCollection').classList.toggle('active',tab==='collection');
-  document.getElementById('tabBtnIndex').classList.toggle('active',tab==='index');
-  document.getElementById('tabBtnQuests').classList.toggle('active',tab==='quests');
-  document.getElementById('tabBtnLeaderboard').classList.toggle('active',tab==='leaderboard');
-  document.getElementById('tabBtnBattlepass').classList.toggle('active',tab==='battlepass');
-  if(tab==='index')renderIndex();
-  if(tab==='quests')renderQuests();
-  if(tab==='leaderboard')renderLeaderboard();
-  if(tab==='battlepass')renderBattlepass();
-}
-
-function renderQuests(){
-  const cont=document.getElementById('questContent');
-  cont.innerHTML='';
-  // ── Ultimate Questline ──
-  const card=document.createElement('div');
-  card.className='quest-card'+(questUnlocked?' complete':'');
-
-  const qTitle=document.createElement('div');qTitle.className='quest-line-title';
-  qTitle.textContent='⚔️ ULTIMATE QUESTLINE';
-  card.appendChild(qTitle);
-
-  // Task 1: Open eggs
-  const eggs=Math.min(totalHatches,QUEST_EGGS_NEEDED);
-  const eggsPct=Math.min(100,(eggs/QUEST_EGGS_NEEDED)*100);
-  const t1=document.createElement('div');t1.className='quest-task';
-  const t1l=document.createElement('div');t1l.className='quest-task-label'+(questEggsDone()?' done':'');
-  t1l.textContent=(questEggsDone()?'✔ ':'')+'Open 2,500 Eggs';
-  const t1bar=document.createElement('div');t1bar.className='quest-bar-wrap';
-  const t1fill=document.createElement('div');t1fill.className='quest-bar-fill'+(questEggsDone()?' done':'');
-  t1fill.style.width=eggsPct+'%';
-  t1bar.appendChild(t1fill);
-  const t1lbl=document.createElement('div');t1lbl.className='quest-bar-label';
-  t1lbl.textContent=eggs.toLocaleString()+' / '+QUEST_EGGS_NEEDED.toLocaleString();
-  t1.appendChild(t1l);t1.appendChild(t1bar);t1.appendChild(t1lbl);
-  card.appendChild(t1);
-
-  // Task 2: Mutated pets
-  const muts=Math.min(countMutatedPets(),QUEST_MUTS_NEEDED);
-  const mutsPct=Math.min(100,(muts/QUEST_MUTS_NEEDED)*100);
-  const t2=document.createElement('div');t2.className='quest-task';
-  const t2l=document.createElement('div');t2l.className='quest-task-label'+(questMutsDone()?' done':'');
-  t2l.textContent=(questMutsDone()?'✔ ':'')+'Collect 10 Mutated Pets';
-  const t2bar=document.createElement('div');t2bar.className='quest-bar-wrap';
-  const t2fill=document.createElement('div');t2fill.className='quest-bar-fill'+(questMutsDone()?' done':'');
-  t2fill.style.width=mutsPct+'%';
-  t2bar.appendChild(t2fill);
-  const t2lbl=document.createElement('div');t2lbl.className='quest-bar-label';
-  t2lbl.textContent=muts+' / '+QUEST_MUTS_NEEDED+(mutsPct&gt;0?' (open packs during Mutation Events!)':'');
-  t2.appendChild(t2l);t2.appendChild(t2bar);t2.appendChild(t2lbl);
-  card.appendChild(t2);
-
-  // Reward section
-  const reward=document.createElement('div');reward.className='quest-reward';
-  const rl=document.createElement('div');rl.className='quest-reward-label';rl.textContent='REWARD:';
-  const rc=document.createElement('canvas');rc.width=48;rc.height=48;rc.style.imageRendering='pixelated';
-  const rctx=rc.getContext('2d');rctx.imageSmoothingEnabled=false;
-  if(questUnlocked){
-    px(rctx,A.shadowking,16,3);
-  } else {
-    // silhouette
-    const silhouette=A.shadowking.map(p=&gt;p?'#220033':N);
-    px(rctx,silhouette,16,3);
-  }
-  const rname=document.createElement('div');
-  rname.style.cssText='font-family:Press Start 2P,monospace;font-size:7px;color:'+(questUnlocked?'#cc88ff':'#440066')+';line-height:1.8;';
-  rname.innerHTML=(questUnlocked?'Shadow King&lt;br&gt;&lt;span style="color:#44ff88;font-size:6px"&gt;✔ UNLOCKED&lt;/span&gt;':'Shadow King&lt;br&gt;&lt;span style="font-size:6px;color:#440066"&gt;???&lt;/span&gt;');
-  reward.appendChild(rl);reward.appendChild(rc);reward.appendChild(rname);
-  card.appendChild(reward);
-
-  if(questUnlocked){
-    const banner=document.createElement('div');banner.className='quest-unlocked-banner';
-    banner.style.marginTop='12px';
-    banner.textContent='👑 SHADOW KING UNLOCKED — Check your collection!';
-    card.appendChild(banner);
-  }
-
-  cont.appendChild(card);
-
-  // Hint blurb
-  const hint=document.createElement('div');
-  hint.style.cssText='font-size:13px;color:var(--textDim);margin-top:10px;line-height:1.7;padding:0 4px;';
-  hint.innerHTML='&lt;b style="color:#6600cc"&gt;Questline pets&lt;/b&gt; cannot be obtained from packs.&lt;br&gt;Complete all tasks to unlock the reward permanently.';
-  cont.appendChild(hint);
-}
-
-const ALL_PETS=[
-  {packName:'Starter',ak:'dog',name:'Dog',rarity:'common'},
-  {packName:'Basic Pack',ak:'rabbit',name:'Rabbit',rarity:'common'},
-  {packName:'Basic Pack',ak:'cat',name:'Tabby Cat',rarity:'rare'},
-  {packName:'Basic Pack',ak:'fox',name:'Crystal Fox',rarity:'epic'},
-  {packName:'Basic Pack',ak:'wolf',name:'Galaxy Wolf',rarity:'legendary'},
-  {packName:'Basic Pack',ak:'dragon',name:'Cosmic Dragon',rarity:'mythic'},
-  {packName:'Jungle Pack',ak:'parrot',name:'Green Parrot',rarity:'common'},
-  {packName:'Jungle Pack',ak:'tiger',name:'Jungle Tiger',rarity:'rare'},
-  {packName:'Jungle Pack',ak:'chameleon',name:'Neon Chameleon',rarity:'epic'},
-  {packName:'Jungle Pack',ak:'panther',name:'Golden Panther',rarity:'legendary'},
-  {packName:'Jungle Pack',ak:'behemoth',name:'Ancient Behemoth',rarity:'mythic'},
-  {packName:'Sea Pack',ak:'fish',name:'Blue Fish',rarity:'common'},
-  {packName:'Sea Pack',ak:'seahorse',name:'Seahorse',rarity:'rare'},
-  {packName:'Sea Pack',ak:'eel',name:'Electric Eel',rarity:'epic'},
-  {packName:'Sea Pack',ak:'angler',name:'Anglerfish',rarity:'legendary'},
-  {packName:'Sea Pack',ak:'kraken',name:'Kraken',rarity:'mythic'},
-  {packName:'Mythical Pack',ak:'golem',name:'Stone Golem',rarity:'common'},
-  {packName:'Mythical Pack',ak:'lava',name:'Lava Salamander',rarity:'rare'},
-  {packName:'Mythical Pack',ak:'sphinx',name:'Void Sphinx',rarity:'epic'},
-  {packName:'Mythical Pack',ak:'phoenix',name:'Phoenix',rarity:'legendary'},
-  {packName:'Mythical Pack',ak:'leviathan',name:'Celestial Leviathan',rarity:'mythic'},
-  {packName:'Champion Pack',ak:'champion',name:'Eternal Champion',rarity:'champion'},
-  {packName:'Questline',ak:'shadowking',name:'Shadow King',rarity:'shadowking'},
-  {packName:'Battlepass',ak:'battledog',name:'Battle Dog',rarity:'common'},
-  {packName:'Battlepass',ak:'battletiger',name:'Battle Tiger',rarity:'rare'},
-  {packName:'Battlepass',ak:'warlion',name:'War Lion',rarity:'epic'},
-  {packName:'Battlepass',ak:'battledragon',name:'Battle Dragon',rarity:'legendary'},
-  {packName:'Battlepass',ak:'wickedwarrior',name:'Wicked Warrior',rarity:'mythic'},
-];
-
-function getOwnedKeys(){
-  const s=new Set();
-  for(const k in col)s.add(col[k].pet.ak);
-  return s;
-}
-
-function renderIndex(){
-  const owned=getOwnedKeys();
-  const total=ALL_PETS.length;
-  const found=[...owned].filter(ak=&gt;ALL_PETS.find(p=&gt;p.ak===ak)).length;
-  document.getElementById('idxCount').textContent=found;
-  document.getElementById('idxTotal').textContent=total;
-  const groups={};
-  ALL_PETS.forEach(p=&gt;{if(!groups[p.packName])groups[p.packName]=[];groups[p.packName].push(p);});
-  const cont=document.getElementById('idxContent');cont.innerHTML='';
-  Object.entries(groups).forEach(([packName,pets])=&gt;{
-    const sec=document.createElement('div');sec.className='idx-section';
-    const title=document.createElement('div');title.className='idx-section-title';title.textContent='— '+packName.toUpperCase()+' —';
-    sec.appendChild(title);
-    const grid=document.createElement('div');grid.className='idx-grid';
-    pets.forEach(petDef=&gt;{
-      const isOwned=owned.has(petDef.ak);
-      const count=isOwned?(()=&gt;{for(const k in col)if(col[k].pet.ak===petDef.ak)return col[k].count;return 1;})():0;
-      const slot=document.createElement('div');
-      slot.className='idx-slot '+(isOwned?'found '+petDef.rarity:'undiscovered');
-      const cv=document.createElement('canvas');cv.width=48;cv.height=48;
-      const ctx=cv.getContext('2d');ctx.imageSmoothingEnabled=false;
-      if(petDef.rarity==='champion'&amp;&amp;isOwned){
-        let h=0;
-        const idxAnim=()=&gt;{
-          if(!document.contains(cv))return;
-          ctx.clearRect(0,0,48,48);drawChampionPet(ctx,3,h);h=(h+2)%360;requestAnimationFrame(idxAnim);
-        };
-        idxAnim();
-      } else if(petDef.rarity==='shadowking'&amp;&amp;!isOwned){
-        // silhouette
-        const sil=A.shadowking.map(p=&gt;p?'#220033':N);
-        px(ctx,sil,16,3);
-      } else {
-        if(petDef.ak==='champion')px(ctx,A.champion,16,3);
-        else px(ctx,A[petDef.ak],16,3);
-      }
-      const nm=document.createElement('div');nm.className='idx-name';nm.textContent=isOwned?petDef.name:'???';
-      const rar=document.createElement('div');rar.className='idx-rarity';
-      const rarInfo=RC[petDef.rarity]||{c:'#fff',l:'CHAMPION'};
-      rar.style.color=rarInfo.c;rar.textContent=isOwned?rarInfo.l:'?????';
-      if(isOwned&amp;&amp;count&gt;0){
-        const badge=document.createElement('div');badge.className='idx-count-badge';badge.textContent='×'+count;slot.appendChild(badge);
-      }
-      slot.appendChild(cv);slot.appendChild(nm);slot.appendChild(rar);grid.appendChild(slot);
-    });
-    sec.appendChild(grid);cont.appendChild(sec);
-  });
-}
-
-// ──────────────────────────────────────────────────────
-//  SAVE / LOAD
-// ──────────────────────────────────────────────────────
-const SAVE_KEY='petHatcherSave_v1';
-let _saveTimer=null;
-
-function saveGame(){
-  const colSave={};
-  for(const k in col){
-    const c=col[k];
-    colSave[k]={count:c.count,pet:c.pet,rarity:c.rarity,mutation:c.mutation,autoOn:c.autoOn};
-  }
-  const data={coins,totalCoins,totalHatches,questUnlocked,col:colSave,username,showUsernames,leaderboard,battleXp,battleLevel,battlepassEggs,battleResets,savedAt:Date.now()};
-  try{
-    localStorage.setItem(SAVE_KEY,JSON.stringify(data));
-    const ind=document.getElementById('saveIndicator');
-    if(ind){ind.style.opacity='1';setTimeout(()=&gt;ind.style.opacity='0',1500);}
-  }catch(e){console.warn('Save failed',e);}
-}
-
-// Debounced save — coalesces rapid events (e.g. fast clicking) into one save 2s after last event
-function debouncedSave(){
-  if(_saveTimer)clearTimeout(_saveTimer);
-  _saveTimer=setTimeout(()=&gt;{_saveTimer=null;saveGame();},2000);
-}
-
-function loadGame(){
-  try{
-    const raw=localStorage.getItem(SAVE_KEY);
-    if(!raw)return false;
-    const data=JSON.parse(raw);
-    coins=data.coins||0;
-    totalCoins=data.totalCoins||0;
-    totalHatches=data.totalHatches||0;
-    questUnlocked=data.questUnlocked||false;
-    username=data.username||null;
-    showUsernames=data.showUsernames||false;
-    leaderboard=data.leaderboard||[];
-    battleXp=data.battleXp||0;
-    battleLevel=data.battleLevel||1;
-    battlepassEggs=data.battlepassEggs||0;
-    battleResets=data.battleResets||0;
-    // Clear default col and restore saved
-    for(const k in col)delete col[k];
-    for(const k in data.col){
-      const c=data.col[k];
-      col[k]={count:c.count,pet:c.pet,rarity:c.rarity,mutation:c.mutation||'none',autoOn:false,autoInterval:null};
-    }
-    // Re-enable auto on pets that had it on
-    for(const k in data.col){
-      if(data.col[k].autoOn)restoreAuto(k);
-    }
-    return true;
-  }catch(e){console.warn('Load failed',e);return false;}
-}
-
-function restoreAuto(key){
-  const c=col[key];
-  if(!c)return;
-  c.autoOn=true;
-  c.autoInterval=setInterval(()=&gt;{
-    const g=calcEffectiveCps(c);coins+=g;totalCoins+=g;updateTop();
-    debouncedSave();
-  },1000);
-}
-
-// ──────────────────────────────────────────────────────
-//  USERNAME / LEADERBOARD / BATTLEPASS LOGIC
-// ──────────────────────────────────────────────────────
-
-function normalizeUsername(str){
-  str=str.toLowerCase();
-  // remove spaces and punctuation
-  str=str.replace(/[^a-z]/g,'');
-  return str;
-}
-
-const forbiddenWords=['nazi','hitler','fuck','shit','ass','bitch','cunt','kike','fag','gay','dyke','coon','spic','rape'];
-function isBadUsername(u){
-  if(!/^[a-z]{3,16}$/.test(u))return true;
-  // duplicate check
-  if(leaderboard.some(e=&gt;e.username===u &amp;&amp; u!==username)) return true;
-  const norm=normalizeUsername(u);
-  for(const w of forbiddenWords){if(norm.includes(w))return true;}
-  return false;
-}
-
-function showUsernameOverlay(){
-  const ov=document.getElementById('usernameOverlay');
-  const inp=document.getElementById('usernameInput');
-  const err=document.getElementById('usernameError');
-  const btn=document.getElementById('usernameSubmit');
-  ov.style.display='flex';
-  inp.value='';err.textContent='';btn.disabled=true;
-  inp.oninput=()=&gt;{
-    inp.value=inp.value.toLowerCase().replace(/[^a-z]/g,'');
-    if(isBadUsername(inp.value)){
-      err.textContent='Username not allowed. Please choose another.';
-      btn.disabled=true;
-    } else {err.textContent='';btn.disabled=inp.value.length&lt;3;}
   };
-  btn.onclick=()=&gt;{
-    username=inp.value;
-    ov.style.display='none';
-    saveGame();
-    updateLeaderboard(calcCps());
-  };
+
+  ws.onerror = () => setStatus('error');
+  ws.onclose = () => { clearInterval(pingInterval); if (document.getElementById('status-text').textContent !== 'OFFLINE') setStatus('disconnected'); };
 }
 
-function loadLeaderboard(data){
-  leaderboard=data||[];
-  renderLeaderboard();
-}
-function saveLeaderboard(){
-  // stored as part of main save
+function disconnect() {
+  if (ws) ws.close();
+  clearInterval(pingInterval);
+  setStatus('disconnected');
 }
 
-function updateLeaderboard(cps){
-  if(!username)return;
-  const existing=leaderboard.find(e=&gt;e.username===username);
-  if(existing){
-    if(cps&gt;existing.cps)existing.cps=cps;
-  } else {
-    leaderboard.push({username,cps});
-  }
-  leaderboard.sort((a,b)=&gt;b.cps-a.cps);
-  if(leaderboard.length&gt;50)leaderboard.length=50;
-  renderLeaderboard();
-  saveGame();
+// Render leaderboard
+function renderLeaderboard() {
+  const sorted = Object.values(leaderboard).sort((a,b) => b.elo - a.elo);
+  const empty = document.getElementById('lb-empty');
+  const list = document.getElementById('lb-list');
+
+  if (sorted.length === 0) { empty.style.display = ''; list.innerHTML = ''; return; }
+  empty.style.display = 'none';
+
+  list.innerHTML = sorted.map((user, i) => {
+    const rank = getRank(user.elo);
+    const prog = getProgress(user.elo);
+    const isTop = i < 3;
+    const posIcons = ['🥇','🥈','🥉'];
+    return `
+      <div class="lb-row ${isTop ? 'top' : ''}" style="border-color:${isTop ? rank.color+'44' : '#181818'}">
+        <div class="lb-pos" style="color:${i===0?'#FFD700':i===1?'#C0C0C0':i===2?'#CD7F32':'#333'};font-size:${isTop?'1.3rem':'1rem'}">
+          ${isTop ? posIcons[i] : '#'+(i+1)}
+        </div>
+        <div class="lb-icon">${rank.icon}</div>
+        <div class="lb-info">
+          <div class="lb-name" style="color:${user.color||'#eee'}">${escHtml(user.username)}</div>
+          <div class="bar-wrap">
+            <div class="bar-bg"><div class="bar-fill" style="width:${prog}%;background:${rank.color}"></div></div>
+            <span class="bar-rank" style="color:${rank.color}">${rank.name}</span>
+          </div>
+        </div>
+        <div class="lb-elo">
+          <div class="lb-elo-val" style="color:${rank.color}">${user.elo.toLocaleString()}</div>
+          <div class="lb-elo-label">ELO</div>
+        </div>
+      </div>`;
+  }).join('');
 }
 
-function renderLeaderboard(){
-  const cont=document.getElementById('leaderboardContent');
-  if(!cont)return;
-  cont.innerHTML='&lt;h2&gt;LEADERBOARD&lt;/h2&gt;';
-  if(leaderboard.length &gt; 0){
-    const toggleBtn = document.createElement('button');
-    toggleBtn.className = 'battlepass-button';
-    toggleBtn.textContent = showUsernames ? 'Hide Usernames' : 'Show Usernames';
-    toggleBtn.onclick = () =&gt; {
-      if(!showUsernames){
-        if(confirm('There is not much of a filter on usernames so show at your own risk.')){
-          showUsernames = true;
-          renderLeaderboard();
-          saveGame();
-        }
-      } else {
-        showUsernames = false;
-        renderLeaderboard();
-        saveGame();
-      }
-    };
-    cont.appendChild(toggleBtn);
-  }
-  leaderboard.forEach((e,i)=&gt;{
-    const div=document.createElement('div');
-    div.className='leaderboard-entry'+(e.username===username?' current':'');
-    const displayName = showUsernames || e.username === username ? e.username : 'Anonymous';
-    div.innerHTML=`&lt;div class="leaderboard-rank"&gt;${i+1}.&lt;/div&gt;
-                    &lt;div class="leaderboard-name"&gt;${displayName}&lt;/div&gt;
-                    &lt;div class="leaderboard-cps"&gt;${e.cps} CPS&lt;/div&gt;`;
-    cont.appendChild(div);
-  });
+// Append chat message
+function appendChat(username, msg, elo, rank, color) {
+  const feed = document.getElementById('chat-feed');
+  const empty = document.getElementById('chat-empty');
+  if (empty) empty.remove();
+
+  const el = document.createElement('div');
+  el.className = 'chat-entry';
+  el.innerHTML = `
+    <span class="chat-rank-icon">${rank.icon}</span>
+    <span class="chat-username" style="color:${color||rank.color}">${escHtml(username)}</span>
+    <span class="chat-elo">[${elo}]</span>
+    <span class="chat-msg">${escHtml(msg)}</span>`;
+  feed.appendChild(el);
+  // keep max 100 entries
+  while (feed.children.length > 100) feed.removeChild(feed.firstChild);
+  feed.scrollTop = feed.scrollHeight;
 }
 
-// Battlepass calculations
-function xpForLevel(l){return 100*l;} // could adjust
-function hasWickedCommander(){
-  return Object.values(col).some(c=&gt;c.pet.ak==='wickedwarrior'&amp;&amp;c.count&gt;0);
-}
-function addBattleXp(amount){
-  if(amount&lt;=0)return;
-  battleXp+=amount;
-  while(battleLevel&lt;50 &amp;&amp; battleXp&gt;=xpForLevel(battleLevel)){
-    battleXp-=xpForLevel(battleLevel);
-    battleLevel++;
-    if(battleLevel%5===0)awardBattlepassEgg();
-  }
-  if(battleLevel&gt;=50){
-    battleXp=Math.min(battleXp,xpForLevel(50)-1);
-  }
-  renderBattlepass();
-  saveGame();
-}
-function awardBattlepassEgg(){
-  battlepassEggs++;
-}
-function renderBattlepass(){
-  const cont=document.getElementById('battlepassContent');
-  if(!cont) return;
-  cont.innerHTML='';
-  const title=document.createElement('h2');title.textContent='BATTLEPASS';cont.appendChild(title);
-  const lvl=document.createElement('div');lvl.className='battlepass-info';lvl.textContent=`Level ${battleLevel}`;
-  cont.appendChild(lvl);
-  const barWrap=document.createElement('div');barWrap.className='battlepass-bar';
-  const fill=document.createElement('div');fill.className='battlepass-fill';
-  const pct=battleLevel&lt;50?((battleXp/xpForLevel(battleLevel))*100):100;
-  fill.style.width=pct+'%';barWrap.appendChild(fill);
-  cont.appendChild(barWrap);
-  const xpinfo=document.createElement('div');xpinfo.className='battlepass-info';
-  xpinfo.textContent=battleLevel&lt;50?`${battleXp} / ${xpForLevel(battleLevel)} XP`:'MAX';
-  cont.appendChild(xpinfo);
-  const egginfo=document.createElement('div');egginfo.className='battlepass-info';
-  egginfo.textContent=`Battlepass Eggs: ${battlepassEggs}`;
-  cont.appendChild(egginfo);
-  if(battlepassEggs&gt;0){
-    const btn=document.createElement('button');btn.className='battlepass-button';
-    btn.textContent='OPEN BATTLEPASS EGG';
-    btn.onclick=openBattlepassEgg;
-    cont.appendChild(btn);
-  }
-  if(battleLevel&gt;=50){
-    const resetBtn=document.createElement('button');resetBtn.className='battlepass-button';
-    resetBtn.textContent='RESET BATTLEPASS';
-    resetBtn.onclick=()=&gt;{
-      if(confirm('Reset battlepass? Progress will be lost but you keep eggs.')){
-        battleLevel=1;battleXp=0;battleResets++;
-        renderBattlepass();saveGame();
-      }
-    };
-    cont.appendChild(resetBtn);
-  }
+// Render ranks tab
+function renderRanks() {
+  const list = document.getElementById('ranks-list');
+  list.innerHTML = RANKS.map(rank => {
+    const count = Object.values(leaderboard).filter(u => getRank(u.elo).name === rank.name).length;
+    return `
+      <div class="rank-card" style="border-left-color:${rank.color};box-shadow:0 0 18px ${rank.color}0d">
+        <div class="rank-card-icon">${rank.icon}</div>
+        <div class="rank-card-info">
+          <div class="rank-card-name" style="color:${rank.color};text-shadow:0 0 12px ${rank.color}55">${rank.name.toUpperCase()}</div>
+          <div class="rank-card-range">${rank.min.toLocaleString()} – ${rank.max.toLocaleString()} ELO</div>
+        </div>
+        <div class="rank-card-count">
+          <div class="rank-count-val" style="color:${rank.color}">${count}</div>
+          <div class="rank-count-label">CHATTERS</div>
+        </div>
+      </div>`;
+  }).join('');
 }
 
-function openBattlepassEgg(){
-  if(battlepassEggs&lt;=0) return;
-  battlepassEggs--;
-  addBattleXp(5); // xp for opening battlepass egg
-  // roll rarity (simple probabilities)
-  const r=Math.random()*100;
-  let rar='common';
-  if(r&lt;1)rar='mythic';
-  else if(r&lt;5)rar='legendary';
-  else if(r&lt;15)rar='epic';
-  else if(r&lt;35)rar='rare';
-  const petDefs={
-    common:{name:'Battle Dog',ak:'battledog',cps:10},
-    rare:{name:'Battle Tiger',ak:'battletiger',cps:30},
-    epic:{name:'War Lion',ak:'warlion',cps:80},
-    legendary:{name:'Battle Dragon',ak:'battledragon',cps:200},
-    mythic:{name:'Wicked Warrior',ak:'wickedwarrior',cps:500}
-  };
-  const pet=petDefs[rar];
-  const key='bp_'+rar+'_'+Math.random().toString(36).slice(2,6);
-  if(!col[key])col[key]={count:0,pet,rarity:rar,mutation:'none',autoOn:false,autoInterval:null};
-  col[key].count++;
-  renderCol();
-  showHatch({isChampion:false},pet,rar,'none');
-  switchTab('collection');
-  saveGame();
+// Stats
+function updateStats() {
+  const sorted = Object.values(leaderboard).sort((a,b) => b.elo - a.elo);
+  document.getElementById('stat-chatters').textContent = sorted.length.toLocaleString();
+  document.getElementById('stat-msgs').textContent = totalMsgs.toLocaleString();
+  document.getElementById('stat-top').textContent = sorted[0]?.username || '—';
 }
 
-// hook into CPS calculation for wicked warrior
-const origCalcEffectiveCps=calcEffectiveCps;
-function calcEffectiveCps(entry){
-  const base=entry.count*(entry.pet.cps||0);
-  const mult=MUTATIONS[entry.mutation||'none'].mult;
-  let total=base*mult;
-  if(hasWickedCommander()) total*=2;
-  return total;
+// Toast
+function showToast(username, rank, elo) {
+  const box = document.getElementById('toasts');
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.style.border = `1px solid ${rank.color}55`;
+  el.innerHTML = `<span>${rank.icon}</span><span class="toast-name" style="color:${rank.color}">${escHtml(username)}</span><span class="toast-info">+1 ELO → ${elo.toLocaleString()}</span>`;
+  box.appendChild(el);
+  setTimeout(() => el.remove(), 2600);
+  // keep max 5
+  while (box.children.length > 5) box.removeChild(box.firstChild);
 }
 
-
-function confirmReset(){
-  const ov=document.getElementById('hatchOverlay');
-  ov.style.display='flex';ov.innerHTML='';
-  const box=document.createElement('div');box.className='hatch-box';box.style.maxWidth='320px';
-  const title=document.createElement('div');
-  title.style.cssText='font-family:Press Start 2P,monospace;font-size:9px;color:#ff4444;margin-bottom:12px;';
-  title.textContent='⚠ RESET GAME?';
-  const msg=document.createElement('div');
-  msg.style.cssText='font-size:15px;color:var(--textDim);margin-bottom:18px;line-height:1.6;';
-  msg.textContent='This will erase ALL progress permanently. Are you sure?';
-  const row=document.createElement('div');row.style.cssText='display:flex;gap:10px;justify-content:center;';
-  const yes=document.createElement('button');yes.className='hclose';
-  yes.style.cssText='border-color:#ff4444;color:#ff4444;';
-  yes.textContent='YES, RESET';
-  yes.onclick=()=&gt;{
-    localStorage.removeItem(SAVE_KEY);
-    location.reload();
-  };
-  const no=document.createElement('button');no.className='hclose';
-  no.textContent='CANCEL';
-  no.onclick=()=&gt;ov.style.display='none';
-  row.appendChild(yes);row.appendChild(no);
-  box.appendChild(title);box.appendChild(msg);box.appendChild(row);
-  ov.appendChild(box);
-  ov.onclick=e=&gt;{if(e.target===ov)ov.style.display='none';};
+// Tab switching
+function switchTab(name, btn) {
+  currentTab = name;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-leaderboard').classList.toggle('hidden', name !== 'leaderboard');
+  document.getElementById('tab-livechat').classList.toggle('hidden', name !== 'livechat');
+  document.getElementById('tab-ranks').classList.toggle('hidden', name !== 'ranks');
+  if (name === 'leaderboard') renderLeaderboard();
+  if (name === 'ranks') renderRanks();
 }
 
-// Auto-save every 10 seconds
-setInterval(saveGame,10000);
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
-buildShop();
-const didLoad=loadGame();
-renderCol();
-updateTop();
-if(!username) showUsernameOverlay();
-if(username) updateLeaderboard(calcCps());
-renderBattlepass();
-if(!didLoad)saveGame(); // fresh save on first run
-&lt;/script&gt;
-&lt;/body&gt;
-&lt;/html&gt;</pre>
+// Init
+updateStats();
+renderLeaderboard();
+renderRanks();
+</script>
 </body>
 </html>
